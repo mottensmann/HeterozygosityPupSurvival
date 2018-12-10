@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.tiff
+internal
+*.fasta
+*.fastq
+arc_gaz_transcriptome*
+p3_out*
+misa.pl
+immune_microsats_raw.csv
+p3_in.pl
