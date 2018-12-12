@@ -1,0 +1,306 @@
+---
+title: "Development of functional microsatellite markers from the Antarctic fur seal transcriptome assembly" 
+subtitle: "Supplementary of: 'Heterozygosity at neutral and immune loci does not influence neonatal mortality due to microbial infection in Antarctic fur seals'"
+author: "Vivienne Litzke, Meinolf Ottensmann, Jaume Forcada & Joseph I. Hoffman"
+output: html_document
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Preface
+
+This document provides all details on the development of functional microsatellites with relation to immmune genes in Antarctic fur seals. Both the Rmarkdown file and the data can be downloaded from the accompanying GitHub repository on (https://github.com/vlitzke/HeterozygosityPupSurvival) as a zip archive containing all the files. Note, a suite of R packages, perl scripts as well as the assembled *Arctocephalus gazella* transcriptome may be downloaded as shown below in order to repeat analyses shown here.
+
+We recommend to download or clone this [GitHub repository](https://github.com/vlitzke/HeterozygosityPupSurvival) in order to access the documentation together with all the files that are needed to repeat analyses shown in this document. Just click on the link above and then on the green box `Clone or download`. In order to function properly, the same structure of folders must be kept. If you have any questions, don't hesitate to contact me at: meinolf.ottensmann[at]web.de or vivienne.litzke[at]gmail.com
+
+- If you have downloaded the project from github then you will see that:
+- The raw data required are located in the folder `data/`
+- The *Arctocephalus gazella* transcriptome[^1] may be downloaded [here](http://ramadda.nerc-bas.ac.uk/repository/entry/show/Polar+Data+Centre/NERC-BAS+Datasets/Genomics/Transcriptomes/Arctocephalus_gazella/Arctocephalus_gazella_transcripts.fasta?entryid=synth%3A2d2268fe-907c-45b0-a493-0a6cab8642e6%3AL1RyYW5zY3JpcHRvbWVzL0FyY3RvY2VwaGFsdXNfZ2F6ZWxsYS9BcmN0b2NlcGhhbHVzX2dhemVsbGFfdHJhbnNjcmlwdHMuZmFzdGE%3D) and saved as `arc_gaz_transcriptome.fasta` in `data`.
+- This pipeline invokes the `MIcroSAtellite identification tool` for primer identification. Click on the following link for details and how to install it: [MISA](http://pgrc.ipk-gatersleben.de/misa/misa.html)[^2]. 
+- Primer devlopment was conducted using [primer3](http://primer3.sourceforge.net/releases.php)[^3].
+- Additionally, the R packages listed below are required and may be installed on your system.
+
+```{r, eval=FALSE}
+install.packages("dplyr")
+install.packages("knitr")
+install.packages("magrittr")
+install.packages("kableExtra")
+```
+
+```{r}
+library(magrittr)
+library(kableExtra)
+```
+
+\newpage
+
+## Identifying microsatellites within the transcriptome
+
+Short tandem repeats were identified within the Antarctic fur seal transcriptome assembly using the script `misa.pl`. The required initiation file called `misa.ini` is available in the folder `data` and defines the minimum number of five repeats for di-, tri- and tetranucleotide motifs. *As already mentioned before, [MISA](http://pgrc.ipk-gatersleben.de/misa/misa.html) needs to be downloaded by the user*
+
+```bash
+# identify microsats
+perl misa.pl arc_gaz_transcriptome.fasta
+```
+
+The code above generates one ouput file `arc_gaz_transcriptome.fasta.misa` containing a total of `r length( readLines("data/arc_gaz_transcriptome.fasta.misa"))` microsatellites found within the transcriptome. The resulting data table is subsequently reformatted for further filtering steps. 
+
+```{r, eval=T}
+# read the data
+data <- readLines("data/arc_gaz_transcriptome.fasta.misa")
+
+# create a matrix
+microsats_table <- matrix(ncol = length(strsplit(data[1], split = "\t")[[1]]),
+                          nrow = length(data))
+for (i in 1:length(data)) {
+microsats_table[i,1:length(strsplit(data[i], split = "\t")[[1]])] <- 
+  strsplit(data[i], split = "\t")[[1]]
+}
+microsats_table <- as.data.frame(microsats_table[2:nrow(microsats_table),])
+
+# add column names
+names(microsats_table) <-
+  c('contig.name', 'ssr.no','ssr.type','ssr.seq','ssr.size','ssr.start','ssr.end') 
+
+# read contig length information
+contig_length <- read.table("data/transcriptlength.txt", header = T)
+names(contig_length) <- c('MatchID', 'contig.length')
+
+# set to character
+microsats_table[["contig.name"]] <-
+  as.character(microsats_table[["contig.name"]])
+contig_length[["MatchID"]] <-
+  as.character(contig_length[["MatchID"]])
+
+# correct 'MatchID' for cross-referencing
+microsats_table[["MatchID"]] <- NA
+for (i in 1:nrow(microsats_table)) {
+  # discard chunk following the underscore (e.g. 4708387_length... becomes 4708387)
+  microsats_table$MatchID[i] <-
+   strsplit(microsats_table$contig.name[i],split = "_")[[1]][1]
+  microsats_table$MatchID[i] <-
+    strsplit(microsats_table$MatchID[i],split = " ")[[1]][1]
+} 
+
+# correct contig_length
+for (i in 1:nrow(contig_length)) {
+  # remove everything after the underscore, see above
+  contig_length$MatchID[i] <-
+    strsplit(contig_length$MatchID[i],split = "_")[[1]][1]
+}
+
+# merge data frames
+microsats_table <-
+dplyr::left_join(microsats_table,contig_length, by = "MatchID")
+
+# some data class conversions
+microsats_table[["ssr.start"]] <-
+  as.numeric(as.character(microsats_table[["ssr.start"]])) 
+microsats_table[["ssr.end"]] <-
+  as.numeric(as.character(microsats_table[["ssr.end"]]))
+microsats_table[["contig.length"]] <-
+  as.numeric(as.character(microsats_table[["contig.length"]]))
+```
+
+```{r, echo=FALSE}
+# overview
+kableExtra::kable(microsats_table[4:10,], booktabs = TRUE,
+                  longtable = TRUE, caption = "Overview of MISA output listing microsatellites by contigs")
+```
+
+\newpage
+
+## Filtering Microsatellites
+
+Among the `r nrow(microsats_table)` identified microsatellites, there are some compound microsatellites as well as repeats that do not offer adequate flanking sites for primer design. These are discarded.
+
+```{r}
+# remove compound microsats
+microsats_table <- 
+  subset(microsats_table, microsats_table[["ssr.type"]] != 'c') 
+microsats_table <- 
+  subset(microsats_table, microsats_table[["ssr.type"]] != 'c*')
+
+# selection based on flanking sites
+microsats_table[["temp"]] <-
+  rep(1,nrow(microsats_table)) # flag for removal
+for (i in 1:nrow(microsats_table)) {
+  # inspect flanking site upstream
+if (microsats_table[["ssr.start"]][i] <= 100) {
+      microsats_table[["temp"]][i] <- 0
+      # inspect flanking site downstream
+} else if ((microsats_table[["contig.length"]][i] -
+            microsats_table[["ssr.end"]][i]) <= 100) {
+    microsats_table[["temp"]][i] <- 0
+  }
+}  
+
+# Remove flagged microsats
+microsats_table <- subset(microsats_table, microsats_table[["temp"]] != 0) 
+microsats_table <- microsats_table[,1:9]
+```
+
+After the above filtering `r nrow(microsats_table)` microsatellites are retained. Now, we select microsatellites that are associated to immunity based on [Gene Ontology](http://www.geneontology.org/) Gene annotations.
+
+```{r}
+# Keywords including 'immune*'
+annotation <- readLines("data/arc_gaz_transcriptome_annotations.txt")
+annotations <- matrix(ncol = 18, nrow = length(annotation))
+
+# fill table
+for (i in 1:nrow(annotations)) {
+annotations[i, 1:length(strsplit(annotation[i], split = "\t")[[1]])] <-
+  strsplit(annotation[i], split = "\t")[[1]]
+}
+annotations <- data.frame(annotations)[-1,]
+annotations <- annotations[, c(1,14:18)]
+names(annotations) <- c('MatchID','goTerm','cellular.components','biological.processes',
+                        'molecular.functions','keywords')
+
+annotations[["MatchID"]] <- as.character(annotations[["MatchID"]])
+for (i in 1:nrow(annotations)) {
+  annotations[["MatchID"]][i] <-
+    strsplit(annotations[["MatchID"]][i],split = "_")[[1]][1]
+} 
+
+annotations.extd <- dplyr::left_join(microsats_table, annotations,by = 'MatchID')
+
+immuneTable2 <- data.frame(annotations.extd) %>% # Check for matches with keywords
+  dplyr::filter(grepl('immun*', keywords)) 
+
+ImmuneMarker_Keywords <- immuneTable2 # 13 within just keywords
+```
+
+
+```{r, echo=FALSE, eval=FALSE}
+# overview
+ImmuneMarker_whole_file$keywords
+kableExtra::kable(ImmuneMarker_Keywords[,c(1, 14)] , 
+                  booktabs = TRUE, longtable = TRUE,
+                  caption = "Keywords 'Immune'") %>%
+kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header"))
+```
+
+For 13 microsatellites, we found a match to the term 'immun*' under the keywords of the GO annotations. To increase the number of suitable microsatellites, we repeated the initial search to all categories of the GO annotations with an extended list of search terms shown below.
+
+```{r}
+# define list of keywords
+immune <- c('immun*',
+            'antigen',
+            'chemokine',
+            'T cell',
+            'MHC',
+            'Antibody',
+            'histocompatibility',
+            'Interleukin',
+            'Leucocyte',
+            'Lymphocyte')
+
+immuneLines <- NULL
+for (i in immune) { 
+  immuneLines <- c(immuneLines, annotation[grep(i, annotation, ignore.case = T)])
+}
+
+immuneTable <- matrix(ncol = 18, nrow = length(immuneLines))
+
+for (i in 1:length(immuneLines)) {
+immuneTable[i,1:length(strsplit(immuneLines[i], split = "\t")[[1]])] <-
+  strsplit(immuneLines[i], split = "\t")[[1]]
+}
+immuneTable <- data.frame(immuneTable)[,c(1,10,14:18)] 
+names(immuneTable) <-
+  c('MatchID','geneID','goTerm','cellular.components','biological.processes',
+                        'molecular.functions','keywords') 
+
+immuneTable[["MatchID"]] <-
+  as.character(immuneTable[["MatchID"]])
+for (i in 1:nrow(immuneTable)) {
+  immuneTable[["MatchID"]][i] <-
+    strsplit(immuneTable[["MatchID"]][i],split = "_")[[1]][1]
+} 
+
+ImmuneMarker_whole_file <-
+  unique(dplyr::inner_join(microsats_table, immuneTable, by = "MatchID")) 
+
+# write to file
+write.csv2(ImmuneMarker_whole_file, file = "data/immune_microsats_raw.csv", row.names = F)
+```
+
+The extended search yielded a total of `r nrow(ImmuneMarker_whole_file)` microsatellites. The entire list is shown below.   
+
+```{r, echo=FALSE}
+kableExtra::kable(ImmuneMarker_whole_file[, c(1, 4, 6:7, 10)],
+                  booktabs = TRUE, longtable = TRUE,
+                  col.names = c('Contig', 'Motif', 'Start', 'End', 'Gene ID'),
+                  caption = "Annotated microsatellites") %>%
+kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header"))
+```
+
+\newpage
+
+## Designing primers
+
+For all of the `r nrow(ImmuneMarker_whole_file)` we developed oligonucleotide primers using the primer design tool [primer3](http://primer3.sourceforge.net/releases.php). In order to use the command line interface, the list of microsatellites should be re-formatted accordingly. 
+
+```{r, eval=T}
+# list of microsatellites 
+data <- read.csv(file = "data/immune_microsats_raw.csv", sep = ';')[,1:7] 
+names(data) <- c('ID','SSR nr.','SSR type','SSR','size','start','end')
+data[["ID"]] <- as.character(data[["ID"]])
+
+for (i in 1:nrow(data)) {
+  if ((nchar(data[["ID"]][i]) > 20)) {
+    data[["ID"]][i] <- 
+      paste0(strsplit(data[["ID"]][[i]],split = "_")[[1]][1]," ", 
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][2]," ",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][3]," ",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][4],"_",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][5],"_",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][6],"_",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][7])
+  }
+}
+write.table(row.names = FALSE, quote = FALSE,x = data,
+            sep = "\t",file = 'data/arc_gaz_transcriptome.fasta.misa2')
+```
+
+## Invoke primer3 for primer design
+
+```bash
+perl p3_in_fur_seal.pl arc_gaz_transcriptome.fasta.misa2
+primer3_core <arc_gaz_transcriptome.fasta.p3in> arc_gaz_transcriptome.fasta.p3out
+``` 
+
+## Overview of initially tested microsatellites
+
+The table below summarises the results of testing 96 primers on 12 Antarctic fur seal indiviudals. See the manuscript for further details. 
+
+\newpage
+\blandscape
+
+```{r, echo=FALSE}
+# overview
+results <- read.csv("data/microsattelites_overview.csv")[,-c(2,7)]
+results$Forward.primer_.5..3._._M13..21..tail <- stringr::str_remove(
+  string = results$Forward.primer_.5..3._._M13..21..tail,
+  pattern = "TGTAAAACGACGGCCAGT")
+kableExtra::kable(results, booktabs = TRUE, 
+                  longtable = TRUE, caption = "Overview microsatellite testing", 
+                  col.names = c("Contig", "Gene ID", "Motif", "Start", "End",
+                                "Forward primer 5'-3'",
+                                "Reverse primer 5'-3'",
+                                "PCR result")) %>%
+kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header"))
+```
+
+\elandscape
+
+[^1]: Humble, E., Thorne, M.A., Forcada, J. & Hoffman, J.I., (2016). Transcriptomic SNP discovery for custom genotyping arrays: impacts of sequence data, SNP calling method and genotyping technology on the probability of validation success. BMC research notes, 9(1), p.418.
+[^2]: Thiel, T., (2003). MISA—Microsatellite identification tool. Website http://pgrc. ipk-gatersleben.
+[^3]: Untergasser, A., Nijveen, H., Rao, X., Bisseling, T., Geurts, R. & Leunissen, J.A., (2007). Primer3Plus, an enhanced web interface to Primer3. Nucleic acids research, 35(suppl_2), pp.W71-W74.
