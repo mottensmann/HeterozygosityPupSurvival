@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Preface
 
-This document provides all the `R code` used for our paper. Both the Rmarkdown file and the data can be downloaded from the accompanying GitHub repository on (https://github.com/vlitzke/HeterozygosityPupSurvival) as a zip archive containing all the files. 
+This document provides all the `R code` used in our paper. Both the Rmarkdown file and the data can be downloaded from the accompanying GitHub repository on (https://github.com/vlitzke/HeterozygosityPupSurvival) as a zip archive containing all the files. 
 Our data originates from samples collected from a colony of Antarctic fur seals (*Arctocephalus gazella*) at Bird Island, South Georgia between the years of 2000 and 2014. We investigated the effects of neutral and immune gene heterozygosity on early mortality due to bacterial infection using the `inbreedR` package.[^1]
 
 [^1]: Stoffel, M. A., Esser, M., Kardos, M., Humble, E., Nichols, H., David, P., & Hoffman, J. I. (2016). inbreedR: an R package for the analysis of inbreeding based on genetic markers. Methods in Ecology and Evolution, 7(11), 1331-1339.
@@ -59,7 +59,7 @@ In order to use `inbreedR`, the working format is typically an *individual x loc
 The first step is to read the data from an excel file. Our original table includes, plate number, well number, species, id, year, health status (represented by a binomial with 0 for healthy and 1 for infected), birth weight, and the following markers (a and b for alleles). 
 
 ```{r read table, message=FALSE, warning=FALSE}
-## reda data
+## read data
 seals <- readxl::read_excel("data/genotypes_raw.xlsx", skip = 1)[1:78,]
 ## express alleles as numerals
 seals[8:ncol(seals)] <- lapply(seals[8:ncol(seals)], as.numeric)
@@ -71,7 +71,7 @@ Here is an example of what the data frame looks like:
 head(seals[1:6,4:12])
 ```
 
-Since demographic data is present in the beginning of the data frame, we will start our new genotype file from the 8th column onwards. The function `convert_raw` converts a common format for genetic markers (two columns per locus) into the `inbreedR` working format. Afterwards, `check_data` allowes to test whether the genotype data frame has the correct format for subsequent analyses using `inbreedR` functions.
+Since demographic data is present in the beginning of our data frame, we will start our new genotype file from the 8th column onwards. The function `convert_raw` converts a common format for genetic markers (two columns per locus) into the `inbreedR` working format. Afterwards, `check_data` allows us to test whether the genotype data frame has the correct format for subsequent analyses that use `inbreedR` functions.
 
 ```{r convert, results='hide', message=FALSE}
 seals_geno <- convert_raw(seals[8:ncol(seals)])
@@ -109,7 +109,7 @@ sealdataweight <- data.frame(id = seals[[4]],  health = factor(seals[[6]]), birt
                              All = all_het, Neutral = neutral_het, Immune = immune_het)
 
 sealdata_reshaped <- reshape2::melt(sealdata)
-sealdataframe_plusyear <- cbind(sealdataweight, year = as.numeric(seals[[5]])) 
+sealdf_year <- cbind(sealdataweight, year = as.numeric(seals[[5]])) 
 ```
 
 ***
@@ -207,16 +207,19 @@ ggsave(het_plot, filename = "het_plot.jpeg",
 
 ### Calculate heterozygosity for each individual locus
 
-As we have previously looked at genome-wide effects, it may be of interest to look for local effects. Therefore, we wanted to examine the heterozygosity for each locus. First, define a function tomput the confidence interval:
+As we have previously looked at genome-wide effects, it may be of interest to look for local effects. Therefore, we  examined the heterozygosity for each locus. First, define the function confidence interval:
 
 ```{r loci het, message=FALSE, results='hide'}
 confidence_interval <- function(vector) {
-  vec_sd <- sd(vector)        # standard deviation of sample
-  n <- length(vector)         # sample size
-  vec_mean <- mean(vector)    # mean of sample
-  # error according to t distribution
+  ## standard deviation 
+  vec_sd <- sd(vector)        
+  ## sample size
+  n <- length(vector)         
+  ## sample mean
+  vec_mean <- mean(vector)    
+  ## error according to t distribution
   error <- qt((.95 + 1)/2, df = n - 1) * vec_sd / sqrt(n)   
-  # confidence interval as a vector
+  ## confidence interval as a vector
   result <- c("lower" = vec_mean - error, "upper" = vec_mean + error)  
   return(result)
 }
@@ -228,15 +231,18 @@ Calculate the heterozygosity for each locus, and use a regression on infection s
 ## calcaute sMLH
 het_per_locus <- apply(seals_geno, 2, sMLH)
 ## add factors 
-df <-  cbind(sealdataframe_plusyear, seals_geno) 
+df <-  cbind(sealdf_year, seals_geno) 
 ## add marker type as names to the data.frame
 names(df)[6:66] <- c(paste0("Immune", 1:13), paste0("Neutral", 1:48))
 
 lm_by_loc <- lapply(1:61, function(x) {
-  value <- df[,x + 7]                                 # extract data of given marker x
-  # res <- summary(lme4::lmer(as.numeric(df$health) ~ value + (1|df$year)))   # do regression
-  # conf <- confint(lme4::lmer(as.numeric(df$health) ~ value + (1|df$year)))
-  res <- summary(lm(as.numeric(df$health) ~ value))   # do regression
+  ## extract data of given marker x
+  value <- df[,x + 7]           
+  ## do regression
+  ## res <- summary(lme4::lmer(as.numeric(df$health) ~ value + (1|df$year)))  
+  ## conf <- confint(lme4::lmer(as.numeric(df$health) ~ value + (1|df$year)))
+  ## do regression
+  res <- summary(lm(as.numeric(df$health) ~ value))  
   conf <- confint(lm(as.numeric(df$health) ~ value))
   f <- res$fstatistic
   pf(f[1], f[2], f[3], lower=FALSE)
@@ -250,7 +256,7 @@ lm_by_loc <- lapply(1:61, function(x) {
                       type = c(rep("Immune", 13),rep("Neutral", 48)),
                       dummy = ""))
 
- # order by effect size
+## order by effect size
 lm_by_loc <- lm_by_loc[with(lm_by_loc, order(type, beta, decreasing = F)),]   
 lm_by_loc$num <- 1:61
 
@@ -332,19 +338,18 @@ ggsave(combo_plot, filename = "combo_plot.jpeg",
 
 ### Modeling
 
-To test for associations between microsatellite heterozygosity and death from bacterial infection, we constructed several alternative generalized linear mixed-models (GLMMs) incorporating relevant predictor variables and quantified their relative support using AICc weights within a multi-model inference framework. All of the models had pup survival as a binary response variable (coded as 0 = alive and 1 = dead) and included year as a random effect to statistically control for any variation in 
-survivorship attributable to inter-annual variation. The following GLMMs were considered:
+To test for associations between microsatellite heterozygosity and death from bacterial infection, we constructed several alternative generalized linear mixed-models (GLMMs) incorporating relevant predictor variables and quantified their relative support using AICc weights within a multi-model inference framework. All of the models had pup survival as a binary response variable (coded as 0 = alive and 1 = dead) and included year as a random effect to statistically control for any variation in survivorship attributable to inter-annual variation. The following GLMMs were considered:
 
 ```{r AIC models}
 models <- list(
-  glmer(health ~  1 + (1|year), data = sealdataframe_plusyear, family = 'binomial'),
-  glmer(health ~  All + (1|year), data = sealdataframe_plusyear, family = 'binomial'),
-  glmer(health ~  Immune + (1|year), data = sealdataframe_plusyear, family = 'binomial'),
-  glmer(health ~  Neutral + (1|year), data = sealdataframe_plusyear, family = 'binomial'), 
-  glmer(health ~  1 + birthweight + (1|year), data = sealdataframe_plusyear, family = 'binomial'),
-  glmer(health ~  All + birthweight + (1|year), data = sealdataframe_plusyear, family = 'binomial'),
-  glmer(health ~  Immune + birthweight + (1|year), data = sealdataframe_plusyear, family = 'binomial'),
-  glmer(health ~  Neutral + birthweight + (1|year), data = sealdataframe_plusyear, family = 'binomial')) 
+  glmer(health ~  1 + (1|year), data = sealdf_year, family = 'binomial'),
+  glmer(health ~  All + (1|year), data = sealdf_year, family = 'binomial'),
+  glmer(health ~  Immune + (1|year), data = sealdf_year, family = 'binomial'),
+  glmer(health ~  Neutral + (1|year), data = sealdf_year, family = 'binomial'), 
+  glmer(health ~  1 + birthweight + (1|year), data = sealdf_year, family = 'binomial'),
+  glmer(health ~  All + birthweight + (1|year), data = sealdf_year, family = 'binomial'),
+  glmer(health ~  Immune + birthweight + (1|year), data = sealdf_year, family = 'binomial'),
+  glmer(health ~  Neutral + birthweight + (1|year), data = sealdf_year, family = 'binomial')) 
 names(models) <- paste0("m", 1:length(models))
 
 ## model selection
@@ -384,7 +389,7 @@ df <- data.frame(p = qobj$pvalues,
 
 #### (A) *g*~2~ for all marker sets.
 
-If there is interest to see if a variation in inbreeding can be captured among different marker sets, calculate *g*~2~ for all and immune microsats and create histograms:
+To explore the idea that variation in inbreeding can be captured among different marker sets, calculate *g*~2~ for all and immune microsats and create histograms:
 
 ```{r supplementary a, message=FALSE, results='hide', warning=FALSE}
 g2_all <- g2_microsats(cbind(neutral_markers, immune_markers), nperm = 9999, nboot = 9999)
@@ -516,7 +521,8 @@ g2_neutral_resampled <- pbapply::pblapply(seq(4, 48, 4), function(x) { -->
                     ucl = confidence_interval(subs$g2)[2]))
 }) %>%  do.call("rbind", .)
 g2_neutral_resampled$loci <- seq(4, 48, 4)
-save(g2_neutral_resampled, file = "data/g2_neutral_resampled.RData")    # save the data
+## save data
+save(g2_neutral_resampled, file = "data/g2_neutral_resampled.RData")    
 
 g2_neutral_resampled_plot <-
   ggplot(data = g2_neutral_resampled, aes(x = loci, y = g2)) +
@@ -545,30 +551,33 @@ g2_neutral_resampled_plot
 
 #### (C) Heat map
 
-Next, we test for patterns in allelic richness among markers (i.e. immune vs neutral), developmental source (i.e. designed for Antarctic fur seals, phocids or otariids). Secondly, we evaluate the cross-amplification success of loci in two other species of pinnipeds, namely Grey seal and Nothern Elephant seal. 
+Next, we test for patterns in allelic richness among markers (i.e. immune vs neutral), developmental source (i.e. designed for Antarctic fur seals, phocids or otariids). Secondly, we evaluate the cross-amplification success of loci in two other species of pinnipeds, namely the Grey seal and Nothern Elephant seal. 
 
 ```{r}
-# Read and format genotypes
+## read and format genotypes
 heatmap_df <- readxl::read_xlsx("data/genotypes_raw.xlsx", skip = 1)[, c(3, 8:ncol(seals))]
 
-# Randomly select six individuals per species
-heatmap_df <- heatmap_df[c(sample(which(heatmap_df[["Species"]] == "Fur seal"), size = 6, replace = F),
-           sample(which(heatmap_df[["Species"]] == "Grey seal"), size = 6, replace = F),
-           sample(which(heatmap_df[["Species"]] == "Northern Elephant seal"), size = 6, replace = F)),]
+## randomly select six individuals per species
+heatmap_df <- heatmap_df[c(sample(which(heatmap_df[["Species"]] == "Fur seal"), 
+                                  size = 6, replace = F),
+           sample(which(heatmap_df[["Species"]] == "Grey seal"), 
+                  size = 6, replace = F),
+           sample(which(heatmap_df[["Species"]] == "Northern Elephant seal"), 
+                  size = 6, replace = F)),]
 
-# Extract geno
+## extract geno
 marker_geno <- apply(heatmap_df[,-1], 2, as.character)
 
-# Get names of loci
+## get loci names
 loci_names <- colnames(marker_geno)[seq(1, ncol(marker_geno), 2)] %>% 
   substring(., first = 1, last = nchar(.) - 2)
 
-# Define a vector of Immune marker names
+## define a vector of immune marker names
 immune_marker_names <- c("Agi01", "Agi02", "Agi03", "Agi04",
                          "Agi05", "Agi06", "Agi07", "Agi08",
                          "Agi09", "Agi10", "Agi11", "Agt10", "Agt47")
 
-# Collapse information for each locus in one column
+## collapse information for each locus in one column
 marker_geno <- lapply(seq(1, ncol(marker_geno), 2), function(x) {
   marker_geno[,x:(x + 1)] %>% 
     apply(., 1, paste0, collapse = "/")
@@ -581,9 +590,10 @@ marker_geno <- lapply(seq(1, ncol(marker_geno), 2), function(x) {
 marker_geno[which(marker_geno == "NA/NA")] <- NA
 
 ## convert to GENIND object
-genind <- adegenet::df2genind(marker_geno, ploidy = 2, sep = "/", pop = heatmap_df[["Species"]] %>% as.factor)
+genind <- adegenet::df2genind(marker_geno, ploidy = 2, sep = "/", 
+                              pop = heatmap_df[["Species"]] %>% as.factor)
 
-## Convert to GENPOP
+## convert to GENPOP
 genpop <- adegenet::genind2genpop(genind)
 
 heatmap_df <- lapply(levels(genpop@loc.fac), function(i) {
@@ -593,8 +603,9 @@ heatmap_df <- lapply(levels(genpop@loc.fac), function(i) {
     df.temp[df.temp == 0] <- 0
     
   } else {
-    df.temp <-   apply(df.temp, 2, function(x) ifelse(x > 0, 1, 0)) %>% ## presence/absence of allele
-      rowSums(na.rm = T) ## count alleles
+    df.temp <-   apply(df.temp, 2, function(x) ifelse(x > 0, 1, 0)) 
+    %>% ## presence/absence of allele
+    rowSums(na.rm = T) ## count alleles
   }
   # return results
   return(data.frame(Species = names(df.temp),
@@ -612,11 +623,14 @@ heatmap_df[["Type"]][which(heatmap_df[["Locus"]] %in% immune_marker_names)] <- '
 
 ## sort by species
 heatmap_df[["Species"]] <- factor(heatmap_df[["Species"]],
-                          levels = c("Fur seal", "Grey seal", "Northern Elephant seal"),
-                          labels = c("Antarctic fur seal", "Grey seal", "Northern Elephant seal"))
+                          levels = c("Fur seal", "Grey seal", 
+                                     "Northern Elephant seal"),
+                          labels = c("Antarctic fur seal", "Grey seal", 
+                                     "Northern Elephant seal"))
 
-## define colours for marker types
-col_key <- ifelse(levels(heatmap_df[["Locus"]]) %in% immune_marker_names, "#C1403D", "#0294A5")
+## define colors for marker types
+col_key <- ifelse(levels(heatmap_df[["Locus"]]) %in% immune_marker_names, 
+                  "#C1403D", "#0294A5")
 ```
 
 ```{r}
@@ -636,7 +650,6 @@ plot <- ggplot(data = heatmap_df, aes(x = Species, y = Locus, fill = Alleles)) +
     axis.text.x = element_text(size = 10)) + 
   xlab("Species") +
   ylab("") 
-plot
 
 ggsave(plot,
        filename = 'HeatmapLoci.tiff',
@@ -644,6 +657,9 @@ ggsave(plot,
        height = 9,
        units = "in",
        dpi = 300)
+```
+```{r, message=FALSE, echo=FALSE, eval=FALSE}
+plot
 ```
 
 ### Compare allelic richness
@@ -654,10 +670,10 @@ The heatmap above shows several patterns which are tested statistically next.
 ## get raw data again
 genotypes_raw <- readxl::read_xlsx("data/genotypes_raw.xlsx", skip = 1)[, c(3, 8:ncol(seals))]
 
-# Extract genotypes
+## extract genotypes
 marker_geno <- apply(genotypes_raw[,-1], 2, as.character)
 
-# Collapse information for each locus in one column
+## collapse information for each locus in one column
 marker_geno <- lapply(seq(1, ncol(marker_geno), 2), function(x) {
   marker_geno[,x:(x + 1)] %>% 
     apply(., 1, paste0, collapse = "/")
@@ -669,9 +685,10 @@ marker_geno <- lapply(seq(1, ncol(marker_geno), 2), function(x) {
 ## set missing data to NA
 marker_geno[which(marker_geno == "NA/NA")] <- NA
 
-## Create GENIND for Antarctic fur seal alone
+## create GENIND for Antarctic fur seal alone
 genind_afs <- adegenet::df2genind(marker_geno[1:78,], ploidy = 2, sep = "/")
-
+```
+```{r, warning=FALSE, results='hide'}
 ## extract allele numbers for both marker types
 immune_afs <- genind@loc.n.all[1:13]
 mean(immune_afs)
@@ -680,10 +697,12 @@ sd(immune_afs)
 neutral_afs <- genind@loc.n.all[14:61]
 mean(neutral_afs)
 sd(neutral_afs)
-
+```
+```{r}
 ## compare marker types
 wilcox.test(immune_afs, neutral_afs, paired = F)
-
+```
+```{r, results='hide'}
 ## compare neutral markers by origin
 neutral_afs <- genind@loc.n.all[14:22]
 mean(neutral_afs)
@@ -692,12 +711,14 @@ sd(neutral_afs)
 neutral_others <- genind@loc.n.all[23:61]
 mean(neutral_others)
 sd(neutral_others)
-
+```
+```{r}
 ## compare by marker
 wilcox.test(neutral_afs, neutral_others, paired = F)
 
 ## cross-amplification
-immune <- dplyr::filter(heatmap_df, Species != "Antarctic fur seal", Type == "Immune")[["Alleles"]]
+immune <- dplyr::filter(heatmap_df, Species != "Antarctic fur seal", 
+                        Type == "Immune")[["Alleles"]]
 immune <- ifelse(is.na(immune), 0, 1) # check if amplified
 mean(immune) ## cross-amplification rate
 
