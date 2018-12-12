@@ -2,7 +2,7 @@
 title: "Development of functional microsattelite markers from the Antarctic fur seal transcriptome assembly" 
 subtitle: "Supplementary of: 'Heterozygosity at neutral and immune loci does not influence neonatal mortality due to microbial infection in Antarctic fur seals'"
 author: "Vivienne Litzke, Meinolf Ottensmann, Jaume Forcada & Joseph I. Hoffman"
-output: pdf_document
+output: html_document
 header-includes:
 - \usepackage{pdflscape}
 - \newcommand{\blandscape}{\begin{landscape}}
@@ -15,9 +15,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Preface
 
-This document provides all details on the development of functional microsattelites with relation to immmune genes in Antarctic fur seals. Both the Rmarkdown file and the data can be downloaded from the accompanying GitHub repository on (URL TO GITHUB) as a zip archive containing all the files. Note, a suite of R packages, perl scripts as well as the assembled *Arctocephalus gazella* transcriptome may be downloaded as shown below in order to repeat analyses shown here.
+This document provides all details on the development of functional microsattelites with relation to immmune genes in Antarctic fur seals. Both the Rmarkdown file and the data can be downloaded from the accompanying GitHub repository on (https://github.com/vlitzke/HeterozygosityPupSurvival) as a zip archive containing all the files. Note, a suite of R packages, perl scripts as well as the assembled *Arctocephalus gazella* transcriptome may be downloaded as shown below in order to repeat analyses shown here.
 
-We recommend to download or clone this [GitHub repository](URL) in order to access the documentation together with all files that are needed to repeat analyses shown in this document. Just click on the link above and then on the green box `Clone or download`. In order to function properly, the same structure of folders must be kept. If you have any questions, don´t hesitate contacting me: meinolf.ottensmann[at]web.de
+We recommend to download or clone this [GitHub repository](https://github.com/vlitzke/HeterozygosityPupSurvival) in order to access the documentation together with all files that are needed to repeat analyses shown in this document. Just click on the link above and then on the green box `Clone or download`. In order to function properly, the same structure of folders must be kept. If you have any questions, don´t hesitate contacting me: meinolf.ottensmann[at]web.de
 
 - If you have downloaded the project from github then you will see that:
 - Raw data required are within the folder `data/`
@@ -30,10 +30,12 @@ We recommend to download or clone this [GitHub repository](URL) in order to acce
 install.packages("dplyr")
 install.packages("knitr")
 install.packages("magrittr")
+install.packages("kableExtra")
 ```
 
 ```{r}
 library(magrittr)
+library(kableExtra)
 ```
 
 \newpage

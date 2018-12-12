@@ -1,7 +1,7 @@
 ---
 title: "R-code for 'Heterozygosity at neutral and immune loci does not influence neonatal mortality due to microbial infection in Antarctic fur seals'"
 author: "Vivienne Litzke, Meinolf Ottensmann, Jaume Forcada & Joseph I. Hoffman"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Preface
 
-This document provides all the `R code` used for our paper. Both the Rmarkdown file and the data can be downloaded from the accompanying GitHub repository on (URL TO GITHUB) as a zip archive containing all the files. 
+This document provides all the `R code` used for our paper. Both the Rmarkdown file and the data can be downloaded from the accompanying GitHub repository on (https://github.com/vlitzke/HeterozygosityPupSurvival) as a zip archive containing all the files. 
 Our data originates from samples collected from a colony of Antarctic fur seals (*Arctocephalus gazella*) at Bird Island, South Georgia between the years of 2000 and 2014. We investigated the effects of neutral and immune gene heterozygosity on early mortality due to bacterial infection using the `inbreedR` package.[^1]
 
 [^1]: Stoffel, M. A., Esser, M., Kardos, M., Humble, E., Nichols, H., David, P., & Hoffman, J. I. (2016). inbreedR: an R package for the analysis of inbreeding based on genetic markers. Methods in Ecology and Evolution, 7(11), 1331-1339.
@@ -33,6 +33,7 @@ install.packages("adegenet")
 install.packages("AICcmodavg")
 install.packages("raster")
 install.packages("reshape2")
+install.packages("kableExtra")
 source("https://bioconductor.org/biocLite.R")
 biocLite("qvalue")
 ```
@@ -50,6 +51,7 @@ library(lme4)
 library(qvalue)
 library(adegenet)
 library(reshape2)
+library(kableExtra)
 ```
 
 In order to use `inbreedR`, the working format is typically an *individual x loci* matrix, where rows represent individuals and every two columns represent a single locus. If an individual is heterozygous at a given locus, it is coded as 1, whereas a homozygote is coded as 0, and missing data are coded as NA. 
@@ -344,7 +346,9 @@ models <- list(
 names(models) <- paste0("m", 1:length(models))
 
 ## model selection
-pander::pandoc.table(AICcmodavg::aictab(models, second.ord = T))
+kableExtra::kable(AICcmodavg::aictab(models, second.ord = T), booktabs = TRUE,
+                  longtable = FALSE, caption = "Model selection")
+
 ```
 
 These included 'null models' without any genetic effects (models i and v) as well as models that included sMLH combined over all loci or calculated separately for the neutral versus immune loci.  Models v to viii also included pup birth weight (in kg) to incorporate any potential effects of body size on survivorship. All of the models were specified using the glmer function of the package “lme4” with a binomial error structure.[^4] Using the R package `AICcmodavg`, the most parsimonious model was selected based on the delta AICc value, which compares weights as a measure of the likelihood of a particular model.[^5] The best supported model has $\Delta$ AICc = 0 and a difference of two or more units was applied as a criterion for choosing one model over a competing model.[^6]
@@ -357,9 +361,9 @@ These included 'null models' without any genetic effects (models i and v) as wel
 
 Apply a false discovery rate correction for a table of p-values.
 
-```{r FDR, message=FALSE, warning=FALSE, results='hide', eval = FALSE}
+```{r FDR, message=FALSE, warning=FALSE, results='hide'}
 
-pval <- read.table("pvalues.txt",header = F, sep = ",") %>% as.vector() %>% .[[1]]
+pval <- read.table("data/pvalues.txt",header = F, sep = ",") %>% as.vector() %>% .[[1]]
 qobj <- qvalue(pval)
 
 qvalues <- qobj$qvalues

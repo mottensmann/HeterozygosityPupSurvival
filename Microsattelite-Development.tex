@@ -1,0 +1,811 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Development of functional microsattelite markers from the Antarctic fur seal transcriptome assembly},
+            pdfauthor={Vivienne Litzke, Meinolf Ottensmann, Jaume Forcada \& Joseph I. Hoffman},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Development of functional microsattelite markers from the Antarctic fur
+seal transcriptome assembly}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+  \subtitle{Supplementary of: `Heterozygosity at neutral and immune loci does not
+influence neonatal mortality due to microbial infection in Antarctic fur
+seals'}
+  \author{Vivienne Litzke, Meinolf Ottensmann, Jaume Forcada \& Joseph I. Hoffman}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+    \date{}
+    \predate{}\postdate{}
+  
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage[table]{xcolor}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+
+\usepackage{pdflscape}
+\newcommand{\blandscape}{\begin{landscape}}
+\newcommand{\elandscape}{\end{landscape}}
+
+\begin{document}
+\maketitle
+
+\subsection{Preface}\label{preface}
+
+This document provides all details on the development of functional
+microsattelites with relation to immmune genes in Antarctic fur seals.
+Both the Rmarkdown file and the data can be downloaded from the
+accompanying GitHub repository on (URL TO GITHUB) as a zip archive
+containing all the files. Note, a suite of R packages, perl scripts as
+well as the assembled \emph{Arctocephalus gazella} transcriptome may be
+downloaded as shown below in order to repeat analyses shown here.
+
+We recommend to download or clone this \href{URL}{GitHub repository} in
+order to access the documentation together with all files that are
+needed to repeat analyses shown in this document. Just click on the link
+above and then on the green box \texttt{Clone\ or\ download}. In order
+to function properly, the same structure of folders must be kept. If you
+have any questions, don´t hesitate contacting me:
+meinolf.ottensmann{[}at{]}web.de
+
+\begin{itemize}
+\tightlist
+\item
+  If you have downloaded the project from github then you will see that:
+\item
+  Raw data required are within the folder \texttt{data/}
+\item
+  The \emph{Arctocephalus gazella} transcriptome\footnote{Humble, E.,
+    Thorne, M.A., Forcada, J. \& Hoffman, J.I., (2016). Transcriptomic
+    SNP discovery for custom genotyping arrays: impacts of sequence
+    data, SNP calling method and genotyping technology on the
+    probability of validation success. BMC research notes, 9(1), p.418.}
+  may be downloaded
+  \href{http://ramadda.nerc-bas.ac.uk/repository/entry/show/Polar+Data+Centre/NERC-BAS+Datasets/Genomics/Transcriptomes/Arctocephalus_gazella/Arctocephalus_gazella_transcripts.fasta?entryid=synth\%3A2d2268fe-907c-45b0-a493-0a6cab8642e6\%3AL1RyYW5zY3JpcHRvbWVzL0FyY3RvY2VwaGFsdXNfZ2F6ZWxsYS9BcmN0b2NlcGhhbHVzX2dhemVsbGFfdHJhbnNjcmlwdHMuZmFzdGE\%3D}{here}
+  and saved as \texttt{arc\_gaz\_transcriptome.fasta} in \texttt{data}.
+\item
+  This pipeline invokes the
+  \texttt{MIcroSAtellite\ identification\ tool} for primer
+  identification. Click on this link for details and how to install it:
+  \href{http://pgrc.ipk-gatersleben.de/misa/misa.html}{MISA}\footnote{Thiel,
+    T., (2003). MISA---Microsatellite identification tool. Website
+    \url{http://pgrc}. ipk-gatersleben.}.
+\item
+  Primer devlopment was conducted using
+  \href{http://primer3.sourceforge.net/releases.php}{primer3}\footnote{Untergasser,
+    A., Nijveen, H., Rao, X., Bisseling, T., Geurts, R. \& Leunissen,
+    J.A., (2007). Primer3Plus, an enhanced web interface to Primer3.
+    Nucleic acids research, 35(suppl\_2), pp.W71-W74.}.
+\item
+  Additionally, the R packages listed below are required and may be
+  installed on your system if not available.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"dplyr"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"knitr"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"magrittr"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"kableExtra"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(magrittr)}
+\KeywordTok{library}\NormalTok{(kableExtra)}
+\end{Highlighting}
+\end{Shaded}
+
+\newpage
+
+\subsection{Identifying microsatellites within the
+transcriptome}\label{identifying-microsatellites-within-the-transcriptome}
+
+Short tandem repeats were identified within the Antarctic fur seal
+transcriptome assembly using the script \texttt{misa.pl}. The required
+initiation file called \texttt{misa.ini} is available in the folder
+\texttt{data} and defines the minimum number of five repeats for di-,
+tri- and tetranucleotide motifs. \emph{As already mentioned before,
+\href{http://pgrc.ipk-gatersleben.de/misa/misa.html}{MISA} needs to be
+downloaded by the user}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# identify microsats}
+\FunctionTok{perl}\NormalTok{ misa.pl arc_gaz_transcriptome.fasta}
+\end{Highlighting}
+\end{Shaded}
+
+The code above generates one ouput file
+\texttt{arc\_gaz\_transcriptome.fasta.misa} containing a total of 2578
+microsattelites found within the transcriptome. The resulting data table
+is subsequently reformatted for further filtering steps.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# read the data}
+\NormalTok{data <-}\StringTok{ }\KeywordTok{readLines}\NormalTok{(}\StringTok{"data/arc_gaz_transcriptome.fasta.misa"}\NormalTok{)}
+
+\CommentTok{# create a matrix}
+\NormalTok{microsats_table <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DataTypeTok{ncol =} \KeywordTok{length}\NormalTok{(}\KeywordTok{strsplit}\NormalTok{(data[}\DecValTok{1}\NormalTok{], }\DataTypeTok{split =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]]),}
+                          \DataTypeTok{nrow =} \KeywordTok{length}\NormalTok{(data))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(data)) \{}
+\NormalTok{microsats_table[i,}\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(}\KeywordTok{strsplit}\NormalTok{(data[i], }\DataTypeTok{split =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]])] <-}\StringTok{ }
+\StringTok{  }\KeywordTok{strsplit}\NormalTok{(data[i], }\DataTypeTok{split =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{\}}
+\NormalTok{microsats_table <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(microsats_table[}\DecValTok{2}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(microsats_table),])}
+
+\CommentTok{# add column names}
+\KeywordTok{names}\NormalTok{(microsats_table) <-}
+\StringTok{  }\KeywordTok{c}\NormalTok{(}\StringTok{'contig.name'}\NormalTok{, }\StringTok{'ssr.no'}\NormalTok{,}\StringTok{'ssr.type'}\NormalTok{,}\StringTok{'ssr.seq'}\NormalTok{,}\StringTok{'ssr.size'}\NormalTok{,}\StringTok{'ssr.start'}\NormalTok{,}\StringTok{'ssr.end'}\NormalTok{) }
+
+\CommentTok{# read contig length information}
+\NormalTok{contig_length <-}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}\StringTok{"data/transcriptlength.txt"}\NormalTok{, }\DataTypeTok{header =}\NormalTok{ T)}
+\KeywordTok{names}\NormalTok{(contig_length) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'MatchID'}\NormalTok{, }\StringTok{'contig.length'}\NormalTok{)}
+
+\CommentTok{# set to character}
+\NormalTok{microsats_table[[}\StringTok{"contig.name"}\NormalTok{]] <-}
+\StringTok{  }\KeywordTok{as.character}\NormalTok{(microsats_table[[}\StringTok{"contig.name"}\NormalTok{]])}
+\NormalTok{contig_length[[}\StringTok{"MatchID"}\NormalTok{]] <-}
+\StringTok{  }\KeywordTok{as.character}\NormalTok{(contig_length[[}\StringTok{"MatchID"}\NormalTok{]])}
+
+\CommentTok{# correct 'MatchID' for cross-referencing}
+\NormalTok{microsats_table[[}\StringTok{"MatchID"}\NormalTok{]] <-}\StringTok{ }\OtherTok{NA}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(microsats_table)) \{}
+  \CommentTok{# discard chunk following the underscore (e.g. 4708387_length... becomes 4708387)}
+\NormalTok{  microsats_table}\OperatorTok{$}\NormalTok{MatchID[i] <-}
+\StringTok{   }\KeywordTok{strsplit}\NormalTok{(microsats_table}\OperatorTok{$}\NormalTok{contig.name[i],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{1}\NormalTok{]}
+\NormalTok{  microsats_table}\OperatorTok{$}\NormalTok{MatchID[i] <-}
+\StringTok{    }\KeywordTok{strsplit}\NormalTok{(microsats_table}\OperatorTok{$}\NormalTok{MatchID[i],}\DataTypeTok{split =} \StringTok{" "}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{1}\NormalTok{]}
+\NormalTok{\} }
+
+\CommentTok{# correct contig_length}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(contig_length)) \{}
+  \CommentTok{# remove everything after the underscore, see above}
+\NormalTok{  contig_length}\OperatorTok{$}\NormalTok{MatchID[i] <-}
+\StringTok{    }\KeywordTok{strsplit}\NormalTok{(contig_length}\OperatorTok{$}\NormalTok{MatchID[i],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{1}\NormalTok{]}
+\NormalTok{\}}
+
+\CommentTok{# merge data frames}
+\NormalTok{microsats_table <-}
+\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{left_join}\NormalTok{(microsats_table,contig_length, }\DataTypeTok{by =} \StringTok{"MatchID"}\NormalTok{)}
+
+\CommentTok{# some data class conversions}
+\NormalTok{microsats_table[[}\StringTok{"ssr.start"}\NormalTok{]] <-}
+\StringTok{  }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(microsats_table[[}\StringTok{"ssr.start"}\NormalTok{]])) }
+\NormalTok{microsats_table[[}\StringTok{"ssr.end"}\NormalTok{]] <-}
+\StringTok{  }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(microsats_table[[}\StringTok{"ssr.end"}\NormalTok{]]))}
+\NormalTok{microsats_table[[}\StringTok{"contig.length"}\NormalTok{]] <-}
+\StringTok{  }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(microsats_table[[}\StringTok{"contig.length"}\NormalTok{]]))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[t]{llllllrrlr}
+\caption{\label{tab:unnamed-chunk-4}Overview of MISA output listing microsattelites by contigs}\\
+\toprule
+  & contig.name & ssr.no & ssr.type & ssr.seq & ssr.size & ssr.start & ssr.end & MatchID & contig.length\\
+\midrule
+4 & AgU000006\_v1.1 & 1 & p3 & (CTC)5 & 15 & 4555 & 4569 & AgU000006 & 7514\\
+5 & AgU000012\_v1.1 & 1 & p2 & (AT)6 & 12 & 5638 & 5649 & AgU000012 & 6391\\
+6 & AgU000013\_v1.1 & 1 & p2 & (AC)5 & 10 & 5429 & 5438 & AgU000013 & 6149\\
+7 & AgU000014\_v1.1 & 1 & p2 & (AG)12 & 24 & 1853 & 1876 & AgU000014 & 6098\\
+8 & AgU000015\_v1.1 & 1 & p3 & (GGC)5 & 15 & 100 & 114 & AgU000015 & 6035\\
+\addlinespace
+9 & AgU000018\_v1.1 & 1 & p2 & (AC)5 & 10 & 4757 & 4766 & AgU000018 & 5608\\
+10 & AgU000018\_v1.1 & 2 & p2 & (TG)5 & 10 & 5364 & 5373 & AgU000018 & 5608\\
+\bottomrule
+\end{longtable}
+
+\newpage
+
+\subsection{Filtering Microsattelites}\label{filtering-microsattelites}
+
+Among the 2577 identified microsatellites there are some compund
+microsatellites as well as repeats that do not offer adequate flanking
+sites for primer design. These are discarded.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# remove compound microsats}
+\NormalTok{microsats_table <-}\StringTok{ }
+\StringTok{  }\KeywordTok{subset}\NormalTok{(microsats_table, microsats_table[[}\StringTok{"ssr.type"}\NormalTok{]] }\OperatorTok{!=}\StringTok{ 'c'}\NormalTok{) }
+\NormalTok{microsats_table <-}\StringTok{ }
+\StringTok{  }\KeywordTok{subset}\NormalTok{(microsats_table, microsats_table[[}\StringTok{"ssr.type"}\NormalTok{]] }\OperatorTok{!=}\StringTok{ 'c*'}\NormalTok{)}
+
+\CommentTok{# selection based on flanking sites}
+\NormalTok{microsats_table[[}\StringTok{"temp"}\NormalTok{]] <-}
+\StringTok{  }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\KeywordTok{nrow}\NormalTok{(microsats_table)) }\CommentTok{# flag for removal}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(microsats_table)) \{}
+  \CommentTok{# inspect flanking site upstream}
+\ControlFlowTok{if}\NormalTok{ (microsats_table[[}\StringTok{"ssr.start"}\NormalTok{]][i] }\OperatorTok{<=}\StringTok{ }\DecValTok{100}\NormalTok{) \{}
+\NormalTok{      microsats_table[[}\StringTok{"temp"}\NormalTok{]][i] <-}\StringTok{ }\DecValTok{0}
+      \CommentTok{# inspect flanking site downstream}
+\NormalTok{\} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ ((microsats_table[[}\StringTok{"contig.length"}\NormalTok{]][i] }\OperatorTok{-}
+\StringTok{            }\NormalTok{microsats_table[[}\StringTok{"ssr.end"}\NormalTok{]][i]) }\OperatorTok{<=}\StringTok{ }\DecValTok{100}\NormalTok{) \{}
+\NormalTok{    microsats_table[[}\StringTok{"temp"}\NormalTok{]][i] <-}\StringTok{ }\DecValTok{0}
+\NormalTok{  \}}
+\NormalTok{\}  }
+
+\CommentTok{# Remove flaged microsats}
+\NormalTok{microsats_table <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(microsats_table, microsats_table[[}\StringTok{"temp"}\NormalTok{]] }\OperatorTok{!=}\StringTok{ }\DecValTok{0}\NormalTok{) }
+\NormalTok{microsats_table <-}\StringTok{ }\NormalTok{microsats_table[,}\DecValTok{1}\OperatorTok{:}\DecValTok{9}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+After the above filtering 1580 microsatellites are retained. Now, we
+select microsatellites that are associated to immunity based on
+\href{http://www.geneontology.org/}{Gene Ontology} Gene annotations.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Keywords including 'immune*'}
+\NormalTok{annotation <-}\StringTok{ }\KeywordTok{readLines}\NormalTok{(}\StringTok{"data/arc_gaz_transcriptome_annotations.txt"}\NormalTok{)}
+\NormalTok{annotations <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DataTypeTok{ncol =} \DecValTok{18}\NormalTok{, }\DataTypeTok{nrow =} \KeywordTok{length}\NormalTok{(annotation))}
+
+\CommentTok{# fill table}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(annotations)) \{}
+\NormalTok{annotations[i, }\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(}\KeywordTok{strsplit}\NormalTok{(annotation[i], }\DataTypeTok{split =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]])] <-}
+\StringTok{  }\KeywordTok{strsplit}\NormalTok{(annotation[i], }\DataTypeTok{split =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{\}}
+\NormalTok{annotations <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(annotations)[}\OperatorTok{-}\DecValTok{1}\NormalTok{,]}
+\NormalTok{annotations <-}\StringTok{ }\NormalTok{annotations[, }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{14}\OperatorTok{:}\DecValTok{18}\NormalTok{)]}
+\KeywordTok{names}\NormalTok{(annotations) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'MatchID'}\NormalTok{,}\StringTok{'goTerm'}\NormalTok{,}\StringTok{'cellular.components'}\NormalTok{,}\StringTok{'biological.processes'}\NormalTok{,}
+                        \StringTok{'molecular.functions'}\NormalTok{,}\StringTok{'keywords'}\NormalTok{)}
+
+\NormalTok{annotations[[}\StringTok{"MatchID"}\NormalTok{]] <-}\StringTok{ }\KeywordTok{as.character}\NormalTok{(annotations[[}\StringTok{"MatchID"}\NormalTok{]])}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(annotations)) \{}
+\NormalTok{  annotations[[}\StringTok{"MatchID"}\NormalTok{]][i] <-}
+\StringTok{    }\KeywordTok{strsplit}\NormalTok{(annotations[[}\StringTok{"MatchID"}\NormalTok{]][i],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{1}\NormalTok{]}
+\NormalTok{\} }
+
+\NormalTok{annotations.extd <-}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{left_join}\NormalTok{(microsats_table, annotations,}\DataTypeTok{by =} \StringTok{'MatchID'}\NormalTok{)}
+
+\NormalTok{immuneTable2 <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(annotations.extd) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# Check for matches with keywords}
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{filter}\NormalTok{(}\KeywordTok{grepl}\NormalTok{(}\StringTok{'immun*'}\NormalTok{, keywords)) }
+
+\NormalTok{ImmuneMarker_Keywords <-}\StringTok{ }\NormalTok{immuneTable2 }\CommentTok{# 13 within just keywords}
+\end{Highlighting}
+\end{Shaded}
+
+For 13 microsattelites there is a match to the term 'immun*' within the
+keywords of the GO annotations. To increase the number of suitable
+microsattelites we repeat the initial search to all categories of the GO
+annotations with an extended list of search terms shown below.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# define list of keywords}
+\NormalTok{immune <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'immun*'}\NormalTok{,}
+            \StringTok{'antigen'}\NormalTok{,}
+            \StringTok{'chemokine'}\NormalTok{,}
+            \StringTok{'T cell'}\NormalTok{,}
+            \StringTok{'MHC'}\NormalTok{,}
+            \StringTok{'Antibody'}\NormalTok{,}
+            \StringTok{'histocompatibility'}\NormalTok{,}
+            \StringTok{'Interleukin'}\NormalTok{,}
+            \StringTok{'Leucocyte'}\NormalTok{,}
+            \StringTok{'Lymphocyte'}\NormalTok{)}
+
+\NormalTok{immuneLines <-}\StringTok{ }\OtherTok{NULL}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in}\NormalTok{ immune) \{ }
+\NormalTok{  immuneLines <-}\StringTok{ }\KeywordTok{c}\NormalTok{(immuneLines, annotation[}\KeywordTok{grep}\NormalTok{(i, annotation, }\DataTypeTok{ignore.case =}\NormalTok{ T)])}
+\NormalTok{\}}
+
+\NormalTok{immuneTable <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DataTypeTok{ncol =} \DecValTok{18}\NormalTok{, }\DataTypeTok{nrow =} \KeywordTok{length}\NormalTok{(immuneLines))}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(immuneLines)) \{}
+\NormalTok{immuneTable[i,}\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(}\KeywordTok{strsplit}\NormalTok{(immuneLines[i], }\DataTypeTok{split =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]])] <-}
+\StringTok{  }\KeywordTok{strsplit}\NormalTok{(immuneLines[i], }\DataTypeTok{split =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{\}}
+\NormalTok{immuneTable <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(immuneTable)[,}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{10}\NormalTok{,}\DecValTok{14}\OperatorTok{:}\DecValTok{18}\NormalTok{)] }
+\KeywordTok{names}\NormalTok{(immuneTable) <-}
+\StringTok{  }\KeywordTok{c}\NormalTok{(}\StringTok{'MatchID'}\NormalTok{,}\StringTok{'geneID'}\NormalTok{,}\StringTok{'goTerm'}\NormalTok{,}\StringTok{'cellular.components'}\NormalTok{,}\StringTok{'biological.processes'}\NormalTok{,}
+                        \StringTok{'molecular.functions'}\NormalTok{,}\StringTok{'keywords'}\NormalTok{) }
+
+\NormalTok{immuneTable[[}\StringTok{"MatchID"}\NormalTok{]] <-}
+\StringTok{  }\KeywordTok{as.character}\NormalTok{(immuneTable[[}\StringTok{"MatchID"}\NormalTok{]])}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(immuneTable)) \{}
+\NormalTok{  immuneTable[[}\StringTok{"MatchID"}\NormalTok{]][i] <-}
+\StringTok{    }\KeywordTok{strsplit}\NormalTok{(immuneTable[[}\StringTok{"MatchID"}\NormalTok{]][i],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{1}\NormalTok{]}
+\NormalTok{\} }
+
+\NormalTok{ImmuneMarker_whole_file <-}
+\StringTok{  }\KeywordTok{unique}\NormalTok{(dplyr}\OperatorTok{::}\KeywordTok{inner_join}\NormalTok{(microsats_table, immuneTable, }\DataTypeTok{by =} \StringTok{"MatchID"}\NormalTok{)) }
+
+\CommentTok{# write to file}
+\KeywordTok{write.csv2}\NormalTok{(ImmuneMarker_whole_file, }\DataTypeTok{file =} \StringTok{"data/immune_microsats_raw.csv"}\NormalTok{, }\DataTypeTok{row.names =}\NormalTok{ F)}
+\end{Highlighting}
+\end{Shaded}
+
+The extended search yielded a total of 137 microsattelites. The entire
+list is shown below.
+
+\begin{longtable}[t]{lllrrl}
+\caption{\label{tab:unnamed-chunk-9}Annotated microsattelites}\\
+\toprule
+  & Contig & Motif & Start & End & Gene ID\\
+\midrule
+\endfirsthead
+\caption[]{Annotated microsattelites \textit{(continued)}}\\
+\toprule
+  & Contig & Motif & Start & End & Gene ID\\
+\midrule
+\endhead
+\
+\endfoot
+\bottomrule
+\endlastfoot
+1 & AgU000001\_v1.1 & (CA)5 & 1586 & 1595 & VWF\_CANLF\\
+2 & AgU000018\_v1.1 & (AC)5 & 4757 & 4766 & AGRF5\_HUMAN\\
+4 & AgU000018\_v1.1 & (TG)5 & 5364 & 5373 & AGRF5\_HUMAN\\
+6 & AgU000026\_v1.1 & (GT)5 & 3260 & 3269 & BMR1A\_HUMAN\\
+8 & AgU000026\_v1.1 & (CA)5 & 3970 & 3979 & BMR1A\_HUMAN\\
+\addlinespace
+10 & AgU000033\_v1.1 & (CT)5 & 1804 & 1813 & RORA\_MOUSE\\
+12 & AgU000033\_v1.1 & (AAT)5 & 3514 & 3528 & RORA\_MOUSE\\
+14 & AgU000038\_v1.1 & (TA)5 & 3523 & 3532 & IL6RB\_HUMAN\\
+17 & AgU000053\_v1.1 & (AG)6 & 3638 & 3649 & AKAP9\_HUMAN\\
+18 & AgU000073\_v1.1 & (TA)6 & 2171 & 2182 & TGFR2\_HUMAN\\
+\addlinespace
+20 & AgU000074\_v1.1 & (AC)8 & 4025 & 4040 & CD302\_PIG\\
+21 & AgU000087\_v1.1 & (ATT)6 & 3163 & 3180 & ITAV\_BOVIN\\
+22 & AgU000123\_v1.1 & (CT)5 & 511 & 520 & NCKP1\_HUMAN\\
+23 & AgU000160\_v1.1 & (TC)6 & 2967 & 2978 & EMP2\_BOVIN\\
+24 & AgU000254\_v1.1 & (TC)13 & 1338 & 1363 & CD44\_CANLF\\
+\addlinespace
+25 & AgU000356\_v1.1 & (GA)5 & 1841 & 1850 & IL3RB\_HUMAN\\
+27 & AgU000367\_v1.1 & (AC)5 & 2501 & 2510 & PSA\_HUMAN\\
+29 & AgU000376\_v1.1 & (CAG)5 & 458 & 472 & EGR1\_HUMAN\\
+31 & AgU000376\_v1.1 & (CCT)5 & 805 & 819 & EGR1\_HUMAN\\
+33 & AgU000386\_v1.1 & (TC)5 & 1928 & 1937 & EZRI\_HUMAN\\
+\addlinespace
+36 & AgU000395\_v1.1 & (CAG)5 & 593 & 607 & TISD\_HUMAN\\
+37 & AgU000395\_v1.1 & (CGC)5 & 1044 & 1058 & TISD\_HUMAN\\
+38 & AgU000395\_v1.1 & (AAC)5 & 2333 & 2347 & TISD\_HUMAN\\
+39 & AgU000416\_v1.1 & (AC)5 & 2494 & 2503 & RAB5B\_PONAB\\
+40 & AgU000523\_v1.1 & (GCG)7 & 2676 & 2696 & MAPK2\_HUMAN\\
+\addlinespace
+42 & AgU000542\_v1.1 & (AG)5 & 662 & 671 & ERBB3\_HUMAN\\
+43 & AgU000543\_v1.1 & (TG)7 & 1250 & 1263 & G9L1E5\_MUSPF\\
+44 & AgU000568\_v1.1 & (CT)7 & 1660 & 1673 & IL33\_CANLF\\
+45 & AgU000696\_v1.1 & (CG)5 & 2544 & 2553 & SOCS3\_HUMAN\\
+46 & AgU000706\_v1.1 & (GT)15 & 1718 & 1747 & PTPRJ\_HUMAN\\
+\addlinespace
+48 & AgU000706\_v1.1 & (TA)6 & 1865 & 1876 & PTPRJ\_HUMAN\\
+50 & AgU000892\_v1.1 & (CA)6 & 1013 & 1024 & SDCB1\_HUMAN\\
+52 & AgU000895\_v1.1 & (GAT)5 & 1865 & 1879 & VAMP7\_HUMAN\\
+53 & AgU000982\_v1.1 & (CT)6 & 1390 & 1401 & ERRFI\_HUMAN\\
+54 & AgU001017\_v1.1 & (TCC)5 & 1891 & 1905 & MSH6\_HUMAN\\
+\addlinespace
+55 & AgU001054\_v1.1 & (TC)5 & 964 & 973 & SDF1\_HUMAN\\
+58 & AgU001075\_v1.1 & (AC)6 & 1677 & 1688 & SIN3A\_HUMAN\\
+59 & AgU001075\_v1.1 & (TC)6 & 2012 & 2023 & SIN3A\_HUMAN\\
+60 & AgU001116\_v1.1 & (GT)5 & 1753 & 1762 & MYLK\_SHEEP\\
+61 & AgU001116\_v1.1 & (GT)5 & 2153 & 2162 & MYLK\_SHEEP\\
+\addlinespace
+62 & AgU001227\_v1.1 & (GA)6 & 1585 & 1596 & UBA3\_HUMAN\\
+63 & AgU001338\_v1.1 & (GAT)7 & 1822 & 1842 & VAMP3\_HUMAN\\
+64 & AgU001432\_v1.1 & (AT)8 & 1652 & 1667 & FOXC1\_HUMAN\\
+65 & AgU001679\_v1.1 & (GA)5 & 1766 & 1775 & TOPRS\_HUMAN\\
+66 & AgU001875\_v1.1 & (TA)10 & 1659 & 1678 & ACKR3\_CANLF\\
+\addlinespace
+67 & AgU001893\_v1.1 & (AG)5 & 504 & 513 & PDPK1\_HUMAN\\
+69 & AgU002020\_v1.1 & (TC)5 & 1366 & 1375 & TF65\_MOUSE\\
+71 & AgU002096\_v1.1 & (CTG)5 & 676 & 690 & M3YA16\_MUSPF\\
+73 & AgU002096\_v1.1 & (GA)5 & 1309 & 1318 & M3YA16\_MUSPF\\
+75 & AgU002160\_v1.1 & (AAG)6 & 1065 & 1082 & PK3CB\_MOUSE\\
+\addlinespace
+76 & AgU002268\_v1.1 & (GCG)5 & 1137 & 1151 & CEBPB\_HUMAN\\
+79 & AgU002404\_v1.1 & (GC)5 & 1363 & 1372 & NFKB2\_HUMAN\\
+80 & AgU002472\_v1.1 & (TAAA)5 & 539 & 558 & ANKR1\_HUMAN\\
+81 & AgU002542\_v1.1 & (AC)8 & 301 & 316 & PAR1\_HUMAN\\
+82 & AgU002562\_v1.1 & (AT)5 & 939 & 948 & AP1AR\_HUMAN\\
+\addlinespace
+83 & AgU002579\_v1.1 & (TG)5 & 1135 & 1144 & AP2A1\_HUMAN\\
+85 & AgU002812\_v1.1 & (CGG)9 & 163 & 189 & TM131\_HUMAN\\
+86 & AgU002813\_v1.1 & (TC)5 & 1011 & 1020 & RIPK1\_HUMAN\\
+89 & AgU002947\_v1.1 & (CT)5 & 1509 & 1518 & NCK1\_HUMAN\\
+91 & AgU003069\_v1.1 & (CT)5 & 688 & 697 & NR4A1\_BOVIN\\
+\addlinespace
+92 & AgU003233\_v1.1 & (AG)5 & 429 & 438 & KSYK\_PIG\\
+93 & AgU003302\_v1.1 & (GT)5 & 114 & 123 & TNF13\_HUMAN\\
+94 & AgU003381\_v1.1 & (TTC)5 & 131 & 145 & OTU7B\_HUMAN\\
+96 & AgU003480\_v1.1 & (AC)5 & 217 & 226 & M3K5\_HUMAN\\
+97 & AgU003551\_v1.1 & (GCA)5 & 1297 & 1311 & CD14\_BOVIN\\
+\addlinespace
+99 & AgU003600\_v1.1 & (AG)5 & 828 & 837 & CY24B\_HUMAN\\
+102 & AgU003731\_v1.1 & (TATT)6 & 1223 & 1246 & IL1B\_EUMJU\\
+104 & AgU003752\_v1.1 & (GA)5 & 687 & 696 & DICER\_HUMAN\\
+105 & AgU003880\_v1.1 & (AC)12 & 504 & 527 & SNAI2\_MOUSE\\
+107 & AgU004117\_v1.1 & (TA)5 & 1207 & 1216 & I23O1\_HUMAN\\
+\addlinespace
+110 & AgU004295\_v1.1 & (TC)5 & 1124 & 1133 & HOIL1\_HUMAN\\
+111 & AgU004366\_v1.1 & (CTC)6 & 223 & 240 & RAGE\_BOVIN\\
+112 & AgU004826\_v1.1 & (AT)7 & 886 & 899 & FBX9\_HUMAN\\
+114 & AgU005175\_v1.1 & (AT)7 & 304 & 317 & ID2\_PONAB\\
+115 & AgU005564\_v1.1 & (AG)5 & 1082 & 1091 & TRIM5\_ATEGE\\
+\addlinespace
+116 & AgU005573\_v1.1 & (CCG)5 & 193 & 207 & TNR1A\_HUMAN\\
+117 & AgU005575\_v1.1 & (GA)5 & 115 & 124 & MEF2C\_PONAB\\
+119 & AgU005648\_v1.1 & (GCT)7 & 207 & 227 & PVRL2\_HUMAN\\
+121 & AgU005740\_v1.1 & (GC)5 & 248 & 257 & CD34\_CANLF\\
+123 & AgU006059\_v1.1 & (CAT)5 & 397 & 411 & PSA1\_HUMAN\\
+\addlinespace
+127 & AgU006102\_v1.1 & (GT)5 & 807 & 816 & SEM3C\_PONAB\\
+128 & AgU006175\_v1.1 & (GA)6 & 227 & 238 & F6PLB9\_CANLF\\
+131 & AgU006223\_v1.1 & (TA)5 & 507 & 516 & MP2K3\_HUMAN\\
+132 & AgU006292\_v1.1 & (AT)8 & 503 & 518 & NPTN\_MOUSE\\
+133 & AgU006300\_v1.1 & (CG)5 & 544 & 553 & TRPM4\_HUMAN\\
+\addlinespace
+135 & AgU006317\_v1.1 & (TA)9 & 797 & 814 & CXL10\_CANLF\\
+138 & AgU006325\_v1.1 & (TA)5 & 102 & 111 & NPC1\_HUMAN\\
+139 & AgU006325\_v1.1 & (CA)5 & 539 & 548 & NPC1\_HUMAN\\
+140 & AgU006358\_v1.1 & (GA)5 & 215 & 224 & PTMS\_HUMAN\\
+141 & AgU006358\_v1.1 & (GGC)5 & 900 & 914 & PTMS\_HUMAN\\
+\addlinespace
+142 & AgU006421\_v1.1 & (AG)8 & 311 & 326 & CLC2D\_HUMAN\\
+143 & AgU007141\_v1.1 & (GCT)5 & 341 & 355 & ROBO4\_HUMAN\\
+144 & AgU007556\_v1.1 & (AG)6 & 107 & 118 & BST2\_HUMAN\\
+146 & AgU007808\_v1.1 & (TC)5 & 678 & 687 & AKIP1\_HUMAN\\
+147 & AgU007843\_v1.1 & (CA)5 & 332 & 341 & SMAD3\_RAT\\
+\addlinespace
+150 & AgU007845\_v1.1 & (CATT)6 & 463 & 486 & TNR12\_HUMAN\\
+151 & AgU008174\_v1.1 & (CCT)5 & 147 & 161 & CD2B2\_MOUSE\\
+152 & AgU008391\_v1.1 & (CA)20 & 338 & 377 & TNR1A\_HUMAN\\
+153 & AgU009399\_v1.1 & (CA)5 & 665 & 674 & UFO\_MOUSE\\
+156 & AgU009504\_v1.1 & (TGC)5 & 440 & 454 & EP300\_HUMAN\\
+\addlinespace
+159 & AgU009791\_v1.1 & (AT)5 & 127 & 136 & Q7Z5E4\_HUMAN\\
+160 & AgU010008\_v1.1 & (CA)8 & 318 & 333 & STA5A\_HUMAN\\
+162 & AgU010547\_v1.1 & (AT)6 & 455 & 466 & WASL\_MOUSE\\
+163 & AgU010559\_v1.1 & (AT)6 & 250 & 261 & CCL20\_BOVIN\\
+167 & AgU010620\_v1.1 & (TG)5 & 309 & 318 & AACS\_RAT\\
+\addlinespace
+168 & AgU011733\_v1.1 & (CA)5 & 418 & 427 & UB2L6\_HUMAN\\
+169 & AgU011784\_v1.1 & (GC)5 & 419 & 428 & ZN580\_MOUSE\\
+170 & AgU013299\_v1.1 & (AC)5 & 546 & 555 & RN125\_MACFA\\
+171 & AgU013484\_v1.1 & (TC)5 & 389 & 398 & DYHC1\_HUMAN\\
+173 & AgU013617\_v1.1 & (TC)5 & 295 & 304 & MARH7\_HUMAN\\
+\addlinespace
+174 & AgU013753\_v1.1 & (TTC)5 & 484 & 498 & MYH10\_MOUSE\\
+175 & AgU013922\_v1.1 & (GT)5 & 310 & 319 & ICAM3\_PANTR\\
+176 & AgU014161\_v1.1 & (CT)5 & 304 & 313 & CSPG2\_BOVIN\\
+177 & AgU014501\_v1.1 & (GA)5 & 300 & 309 & NKAP\_HUMAN\\
+178 & AgU014501\_v1.1 & (AGA)6 & 445 & 462 & NKAP\_HUMAN\\
+\addlinespace
+179 & AgU032052\_v1.1 & (AT)6 & 1875 & 1886 & SKAP2\_HUMAN\\
+180 & AgU032202\_v1.1 & (AG)5 & 799 & 808 & LEG3\_CANLF\\
+181 & AgU032055\_v1.1 & (TA)5 & 524 & 533 & TXNIP\_HUMAN\\
+182 & AgU032268\_v1.1 & (AC)21 & 553 & 594 & CD59\_PIG\\
+183 & AgU025816\_v1.1 & (GGA)6 & 126 & 143 & HS90A\_HUMAN\\
+\addlinespace
+185 & AgU032568\_v1.1 & (CCT)6 & 365 & 382 & KIF3B\_HUMAN\\
+187 & AgU032760\_v1.1 & (AGA)6 & 122 & 139 & CHD7\_HUMAN\\
+188 & 4741325\_length\_871\_cvg\_4.5\_tip\_1 & (CA)5 & 760 & 769 & GCSAM\_HUMAN\\
+189 & 4744327\_length\_942\_cvg\_8.2\_tip\_1 & (AG)5 & 120 & 129 & IFIH1\_HUMAN\\
+190 & 4744731\_length\_953\_cvg\_17.8\_tip\_0 & (GA)6 & 219 & 230 & CD20\_CANLF\\
+\addlinespace
+192 & 4744731\_length\_953\_cvg\_17.8\_tip\_0 & (TTC)5 & 466 & 480 & CD20\_CANLF\\
+194 & 4746463\_length\_1006\_cvg\_3.8\_tip\_1 & (GGC)6 & 102 & 119 & EGR2\_PIG\\
+195 & 4750219\_length\_1140\_cvg\_4.7\_tip\_1 & (CT)5 & 568 & 577 & SNAI1\_HUMAN\\
+196 & 4750387\_length\_1146\_cvg\_5.5\_tip\_1 & (AAG)5 & 530 & 544 & DAB2P\_HUMAN\\
+198 & 4750419\_length\_1148\_cvg\_8.7\_tip\_1 & (CA)5 & 901 & 910 & GAB2\_HUMAN\\
+\addlinespace
+200 & 4750933\_length\_1171\_cvg\_8.8\_tip\_1 & (TC)5 & 945 & 954 & DYH7\_HUMAN\\
+201 & 4751237\_length\_1187\_cvg\_6.3\_tip\_1 & (GA)5 & 192 & 201 & SRC\_HUMAN\\
+204 & 4751391\_length\_1195\_cvg\_12.9\_tip\_0 & (TC)5 & 704 & 713 & MEFV\_MOUSE\\
+206 & 4753675\_length\_1332\_cvg\_9.9\_tip\_1 & (TC)6 & 418 & 429 & E2AK3\_HUMAN\\
+207 & 4754597\_length\_1401\_cvg\_5.7\_tip\_1 & (GA)5 & 477 & 486 & MYOM1\_MOUSE\\
+\addlinespace
+208 & 4755571\_length\_1487\_cvg\_10.6\_tip\_1 & (AG)5 & 1029 & 1038 & AGRA3\_HUMAN\\
+209 & 4756187\_length\_1545\_cvg\_8.7\_tip\_1 & (CA)7 & 319 & 332 & TNR9\_HUMAN\\*
+\end{longtable}
+
+\newpage
+
+\subsection{Designing primers}\label{designing-primers}
+
+For all of the 137 we developed oligonucleotide primers using the primer
+design tool \href{http://primer3.sourceforge.net/releases.php}{primer3}.
+In order to use the command line interface, the list list of
+microsatellites may be be re-formatted accordingly.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# list of microsatellites }
+\NormalTok{data <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\DataTypeTok{file =} \StringTok{"data/immune_microsats_raw.csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{';'}\NormalTok{)[,}\DecValTok{1}\OperatorTok{:}\DecValTok{7}\NormalTok{] }
+\KeywordTok{names}\NormalTok{(data) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'ID'}\NormalTok{,}\StringTok{'SSR nr.'}\NormalTok{,}\StringTok{'SSR type'}\NormalTok{,}\StringTok{'SSR'}\NormalTok{,}\StringTok{'size'}\NormalTok{,}\StringTok{'start'}\NormalTok{,}\StringTok{'end'}\NormalTok{)}
+\NormalTok{data[[}\StringTok{"ID"}\NormalTok{]] <-}\StringTok{ }\KeywordTok{as.character}\NormalTok{(data[[}\StringTok{"ID"}\NormalTok{]])}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(data)) \{}
+  \ControlFlowTok{if}\NormalTok{ ((}\KeywordTok{nchar}\NormalTok{(data[[}\StringTok{"ID"}\NormalTok{]][i]) }\OperatorTok{>}\StringTok{ }\DecValTok{20}\NormalTok{)) \{}
+\NormalTok{    data[[}\StringTok{"ID"}\NormalTok{]][i] <-}\StringTok{ }
+\StringTok{      }\KeywordTok{paste0}\NormalTok{(}\KeywordTok{strsplit}\NormalTok{(data[[}\StringTok{"ID"}\NormalTok{]][[i]],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{1}\NormalTok{],}\StringTok{" "}\NormalTok{, }
+             \KeywordTok{strsplit}\NormalTok{(data[[}\StringTok{"ID"}\NormalTok{]][[i]],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{2}\NormalTok{],}\StringTok{" "}\NormalTok{,}
+             \KeywordTok{strsplit}\NormalTok{(data[[}\StringTok{"ID"}\NormalTok{]][[i]],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{3}\NormalTok{],}\StringTok{" "}\NormalTok{,}
+             \KeywordTok{strsplit}\NormalTok{(data[[}\StringTok{"ID"}\NormalTok{]][[i]],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{4}\NormalTok{],}\StringTok{"_"}\NormalTok{,}
+             \KeywordTok{strsplit}\NormalTok{(data[[}\StringTok{"ID"}\NormalTok{]][[i]],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{5}\NormalTok{],}\StringTok{"_"}\NormalTok{,}
+             \KeywordTok{strsplit}\NormalTok{(data[[}\StringTok{"ID"}\NormalTok{]][[i]],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{6}\NormalTok{],}\StringTok{"_"}\NormalTok{,}
+             \KeywordTok{strsplit}\NormalTok{(data[[}\StringTok{"ID"}\NormalTok{]][[i]],}\DataTypeTok{split =} \StringTok{"_"}\NormalTok{)[[}\DecValTok{1}\NormalTok{]][}\DecValTok{7}\NormalTok{])}
+\NormalTok{  \}}
+\NormalTok{\}}
+\KeywordTok{write.table}\NormalTok{(}\DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{quote =} \OtherTok{FALSE}\NormalTok{,}\DataTypeTok{x =}\NormalTok{ data,}
+            \DataTypeTok{sep =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{,}\DataTypeTok{file =} \StringTok{'data/arc_gaz_transcriptome.fasta.misa2'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Invoke primer3 for primer
+design}\label{invoke-primer3-for-primer-design}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{perl}\NormalTok{ p3_in_fur_seal.pl arc_gaz_transcriptome.fasta.misa2}
+\ExtensionTok{primer3_core} \OperatorTok{<}\NormalTok{arc_gaz_transcriptome.fasta.p3in}\OperatorTok{>}\NormalTok{ arc_gaz_transcriptome.fasta.p3out}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Overview of initially tested
+microsattelites}\label{overview-of-initially-tested-microsattelites}
+
+The table below summarises the results of testing 96 primers on 12
+Antarctic fur seal indiviudals. See the manuscript for further details.
+
+\newpage
+
+\blandscape
+
+\begin{longtable}[t]{lllrrlll}
+\caption{\label{tab:unnamed-chunk-11}Overview microsattelite testing}\\
+\toprule
+Contig & Gene ID & Motif & Start & End & Forward primer 5'-3' & Reverse primer 5'-3' & PCR result\\
+\midrule
+\endfirsthead
+\caption[]{Overview microsattelite testing \textit{(continued)}}\\
+\toprule
+Contig & Gene ID & Motif & Start & End & Forward primer 5'-3' & Reverse primer 5'-3' & PCR result\\
+\midrule
+\endhead
+\
+\endfoot
+\bottomrule
+\endlastfoot
+AgU000073 & TGFR2\_HUMAN & (TA)6 & 2171 & 2182 & GAAGCATTCTAGGCCTTTGACA & GAGCTCTCCAAACAAACCAATT & Monomorph\\
+AgU000386 & EZRI\_HUMAN & (TC)5 & 1928 & 1937 & GCCTTGATTGTAGTCCTCAGC & GAACTAAGCTCTGCCCAAGG & Polymorph\\
+AgU000568 & IL33\_CANLF & (CT)7 & 1660 & 1673 & GAGCCTGCTTCTCCCTCTG & TCCCTGAAGCATAGTGTCAGA & Failed\\
+AgU000706 & PTPRJ\_HUMAN & (GT)15 & 1718 & 1747 & GGTTGGCATTTTATGTGTGTCC & TGCAGAGAGACTAAAGCCAGT & Polymorph\\
+AgU000982 & ERRFI\_HUMAN & (CT)6 & 1390 & 1401 & CAGACTTTTCTCCAACGCCA & TGAAGCGCAAACATCTGTCC & Monomorph\\
+\addlinespace
+AgU001227 & UBA3\_HUMAN & (GA)6 & 1585 & 1596 & TGGGGTTGGTACTTGTAAGCA & TGGGTGCTCACATGAAAACTG & Monomorph\\
+AgU001338 & VAMP3\_HUMAN & (GAT)7 & 1822 & 1842 & CTGGGGCTACACTGGTTCTT & GGAGTTAGACGATCGTGCAG & Monomorph\\
+AgU001875 & ACKR3\_CANLF & (TA)10 & 1659 & 1678 & GGCTAGTTGGATTTCAGTTTTGA & CTGTTCCATATCCCATGCCG & Monomorph\\
+AgU003551 & CD14\_BOVIN & (GCA)5 & 1297 & 1311 & CAGAAGCAGCGGAAATCCTC & ACGTGTGTGGAGCCTAGAAA & Monomorph\\
+AgU004366 & RAGE\_BOVIN & (CTC)6 & 223 & 240 & GGGGCTGATAGATGGGGTC & GAACTGTAGCCCTGGTCCTG & Polymorph\\
+\addlinespace
+AgU006292 & NPTN\_MOUSE & (AT)8 & 503 & 518 & CTGCTGCCGTCTAGTGATGA & ACCAGAACTGCACGATTTCC & Monomorph\\
+AgU006421 & CLC2D\_HUMAN & (AG)8 & 311 & 326 & GCCAACTATATACAAAGGGCGT & GCTTAACCAACTGAGCCACC & Failed\\
+AgU007843 & SMAD3\_RAT & (CA)5 & 332 & 341 & ACGGAGAAGTGGGAATAACAGA & CACTGATGTCTTGTTGGGCA & Monomorph\\
+AgU007845 & TNR12\_HUMAN & (CATT)6 & 463 & 486 & ATCCAGTGACAGTGAGAGCC & GCCTTGGAGAGCTGATTCAC & Monomorph\\
+AgU008391 & TNR1A\_HUMAN & (CA)20 & 338 & 377 & CCCTATCTCTGCAGCCACAA & ATGCCCTTCGGACCCTTTT & Monomorph\\
+\addlinespace
+AgU013617 & MARH7\_HUMAN & (TC)5 & 295 & 304 & TGGTCTTGCTCCCTGTGAAT & GTTCCCAGATCTTCATCAATGGT & Polymorph\\
+AgU014501 & NKAP\_HUMAN & (GA)5 & 300 & 309 & TCTGACGAACACACACCAGT & TCATCGCTGGAGTCTGAGTC & Monomorph\\
+AgU032055 & TXNIP\_HUMAN & (TA)5 & 524 & 533 & TGATAGCAGCAACCCTTCTCA & TCATGTGACTCCTTGGAATGG & Monomorph\\
+AgU032268 & CD59\_PIG & (AC)21 & 553 & 594 & CTGCCAGACACCAGCTAGTT & ATCCTCTCCCTTTATGGCCC & Failed\\
+AgU025816 & HS90A\_HUMAN & (GGA)6 & 126 & 143 & GAAGAGAAGGAGCCCGATGA & TGCCAAGTGATCTTCCCAGT & Polymorph\\
+\addlinespace
+AgU003233 & KSYK\_PIG & (AG)5 & 429 & 438 & GTCATGTCCCGCACGAGG & GCTGCGCAACTACTACTACG & Monomorph\\
+AgU003480 & M3K5\_HUMAN & (AC)5 & 217 & 226 & CTGCTTCTCGGATTCTGCAC & CTGTTGCACTTCGGCCAAAT & Monomorph\\
+AgU005564 & TRIM5\_ATEGE & (AG)5 & 1082 & 1091 & GAAAGAGAGCAGCATGACGG & AAGACACTCAGGGGCACATG & Monomorph\\
+AgU006175 & F6PLB9\_CANLF & (GA)6 & 227 & 238 & GGACTCCTTCAAGTTCGAATTTG & GAACACATCAGCTTGCCCTG & Polymorph\\
+AgU006300 & TRPM4\_HUMAN & (CG)5 & 544 & 553 & AACGCTGTGTCCACCTTTTG & GCTCCGCCCCTTATCATCAT & Monomorph\\
+\addlinespace
+AgU007556 & BST2\_HUMAN & (AG)6 & 107 & 118 & ACAGATGTTCTTCCCCTTAGAGA & GTGCCTCCATTGGTTAAGCG & Monomorph\\
+AgU009399 & UFO\_MOUSE & (CA)5 & 665 & 674 & CCACTTGACTGGCATCTTGG & ATGCTGGTGAAGTTCATGGC & Failed\\
+AgU013299 & RN125\_MACFA & (AC)5 & 546 & 555 & AACGGCAAAGTGGACAGAAC & GCGAAATGAGGGCACACATA & Polymorph\\
+AgU032202 & LEG3\_CANLF & (AG)5 & 799 & 808 & TGCTTTCCACTTTAACCCGC & CAGGTCATGATCCCAGGGTC & Polymorph\\
+4744327 & IFIH1\_HUMAN & (AG)5 & 120 & 129 & CTTTTAGCCACAGGTCAGCC & ACTTCCCATGGTGCCTGAAT & Polymorph\\
+\addlinespace
+4750387 & DAB2P\_HUMAN & (AAG)5 & 530 & 544 & GGGAGCACTTTGAGTTCCAC & ATGGTGATGGTCTGGTAGCG & Monomorph\\
+4751391 & MEFV\_MOUSE & (TC)5 & 704 & 713 & GGCTGCTGAGTCTGGATGAT & AGTCCTAGTGTCACGCTACG & Monomorph\\
+AgU000074 & CD302\_PIG & (AC)8 & 4025 & 4040 & GCCATGTTAAAAGGTCCAGCA & GTGGATGATCTGTGAACAAGTGT & Monomorph\\
+AgU000254 & CD44\_CANLF & (TC)13 & 1338 & 1363 & TCCTCTTCTTCCTCCTCTTCC & AGAAGTCCCATTGGTCCTGG & Polymorph\\
+AgU000523 & MAPK2\_HUMAN & (GCG)7 & 2676 & 2696 & AGGCTCGACTTGACATGGAA & CATGCTGTCCAACTCCCAAG & Monomorph\\
+\addlinespace
+AgU000543 & G9L1E5\_MUSPF & (TG)7 & 1250 & 1263 & GTCCCCAGCACAACTCTTCT & TCAGGAAAGAACGCCAAAGC & Monomorph\\
+AgU001432 & FOXC1\_HUMAN & (AT)8 & 1652 & 1667 & TACATACATCCCCGTGAGCC & ATCCCTTTCCAACCCACAGT & Polymorph\\
+AgU002542 & PAR1\_HUMAN & (AC)8 & 301 & 316 & TTCTACACCGCACTGCAAAC & ACGACAAGTCTGATTTGCATGT & Monomorph\\
+AgU002812 & TM131\_HUMAN & (CGG)9 & 163 & 189 & AGGGTGGTCGAAGTCTTTGT & CAAGCAGAGCCAGCACAG & Polymorph\\
+AgU003880 & SNAI2\_MOUSE & (AC)12 & 504 & 527 & TCTTCACTCCGGCTCCAAAT & TCCTCTCAATCTAGCTGTCAGT & Polymorph\\
+\addlinespace
+AgU004826 & FBX9\_HUMAN & (AT)7 & 886 & 899 & GGCTTCACATCCAGTCCTCT & CCCTCCCCTGAAGCAAGTAA & Monomorph\\
+AgU005175 & ID2\_PONAB & (AT)7 & 304 & 317 & CAGAAATACACATCTCTGCCACT & TTTCAAAGGTGGAGCGTGAA & Polymorph\\
+AgU005648 & PVRL2\_HUMAN & (GCT)7 & 207 & 227 & GAGTAGAGCGGGCGGGAA & CACTCGGACTTGCACATCCT & Monomorph\\
+AgU010008 & STA5A\_HUMAN & (CA)8 & 318 & 333 & GATCTGGAGAGCAAGCTGGT & AGGCTCGCTCTCATGAATGT & Monomorph\\
+4756187 & TNR9\_HUMAN & (CA)7 & 319 & 332 & TCCGAACCAATGGAAAGTTTGT & CTTGTGGGAAAGGGGCATTT & Polymorph\\
+\addlinespace
+4744731 & CD20\_CANLF & (GA)6 & 219 & 230 & TGACATGTTTTGCCTGCAGT & GTGTTCATAGCTTCCAAGAGACA & Polymorph\\
+4746463 & EGR2\_PIG & (GGC)6 & 102 & 119 & GGCAGGTGGTGTGGGTTATA & CTCCACTCACTCCACTCTCC & Monomorph\\
+4753675 & E2AK3\_HUMAN & (TC)6 & 418 & 429 & TGAGCCCTTTACTGTGCAGA & TTTCTCCTCCAAGACCGACC & Failed\\
+AgU001075 & SIN3A\_HUMAN & (TC)6 & 2012 & 2023 & TCCTTCCTTTCTGTCTTTCTTGT & CTGTTTGTGCCGAGGGTAAG & Monomorph\\
+AgU007141 & ROBO4\_HUMAN & (GCT)5 & 341 & 355 & TCCACGCCTAGCCTGCTG & CAGAAGTGATTGCTGGTGGG & Failed\\
+\addlinespace
+AgU009791 & Q7Z5E4\_HUMAN & (AT)5 & 127 & 136 & CACAGGTAGAGAGCAAACAAGG & TTGCAGCTGGTTTTCGAGTT & Monomorph\\
+AgU010559 & CCL20\_BOVIN & (AT)6 & 250 & 261 & AGCAAACACAGACACACACA & ATGGAATTGGACAGAGCCCA & Failed\\
+AgU010620 & AACS\_RAT & (TG)5 & 309 & 318 & TTCCCCATGTTCTTCCCGG & AAGGCAAGATCGCTCCTCAG & Monomorph\\
+AgU014161 & CSPG2\_BOVIN & (CT)5 & 304 & 313 & CGAATGCTTTAGATGGTCTGGG & GTGCCAGCTACCTCCTTTCT & Monomorph\\
+AgU032568 & KIF3B\_HUMAN & (CCT)6 & 365 & 382 & CCTTCCTCCTCACCCTCTTC & AAGCCAAGGGTCAATGAGGA & Monomorph\\
+\addlinespace
+AgU000053 & AKAP9\_HUMAN & (AG)6 & 3638 & 3649 & TTTTACACAGACGTTTTGCAATG & CTGCTGTCCCTGAATCTTACT & Monomorph\\
+AgU000087 & ITAV\_BOVIN & (ATT)6 & 3163 & 3180 & TGAGAAACATTTGTGCGAGGG & TCAAAAGTCTTTCACAGCCCTC & Monomorph\\
+AgU000160 & EMP2\_BOVIN & (TC)6 & 2967 & 2978 & TCCGAATGCCAGCCTTCATA & CGGCCTCATGTACCTGATCT & Monomorph\\
+AgU000892 & SDCB1\_HUMAN & (CA)6 & 1013 & 1024 & CGTGTTTTATAGGCGCGCA & CTGTGTTAGAACCAGTCACCT & Monomorph\\
+AgU002160 & PK3CB\_MOUSE & (AAG)6 & 1065 & 1082 & AGGTGTGGATAAGTTGGCTGA & TGAACAATCCCCGATGACCA & Monomorph\\
+\addlinespace
+AgU003731 & IL1B\_EUMJU & (TATT)6 & 1223 & 1246 & TCTACTTACTCGGAGCCAGC & GATGCTTCTTGGCCCTCTTG & Monomorph\\
+AgU010547 & WASL\_MOUSE & (AT)6 & 455 & 466 & TGCACACAATAACAGGGAGT & GGATGATGATGAATGGGAAGACT & Failed\\
+AgU032052 & SKAP2\_HUMAN & (AT)6 & 1875 & 1886 & TGCTGACGAGGTATCTGTGG & TCAGTACGTTCACAGCTAGAATC & Monomorph\\
+AgU032760 & CHD7\_HUMAN & (AGA)6 & 122 & 139 & GCCCAGCTAGTGAAGAGTGA & GGTTCTTTCGGTTCCTTCGG & Monomorph\\
+AgU000033 & RORA\_MOUSE & (AAT)5 & 3514 & 3528 & AGCTTACCAGGAAGCAAAGT & TGCTAGCGTGTTCACTGTTG & Monomorph\\
+\addlinespace
+AgU000376 & EGR1\_HUMAN & (CAG)5 & 458 & 472 & TGGAAGAGATGATGCTGCTGA & TCAGGAAAAGACTCTGCGGT & Monomorph\\
+AgU000895 & VAMP7\_HUMAN & (GAT)5 & 1865 & 1879 & TTCACACACTTTGGCCATGT & TCAGCGAGGAGAAAGATTGGA & Failed\\
+AgU001017 & MSH6\_HUMAN & (TCC)5 & 1891 & 1905 & TGTCTCATGAGCGTGGACTT & GCCCTATGTGTCGTCCAGTA & Polymorph\\
+AgU002096 & M3YA16\_MUSPF & (CTG)5 & 676 & 690 & GTGGATGAAGACCGGACTGA & AGACAACCTGACTGCCTTCA & Monomorph\\
+AgU002268 & CEBPB\_HUMAN & (GCG)5 & 1137 & 1151 & TCCTCCTTCCGCTTGCAG & ACCTCTTCTCCGACGACTAC & Failed\\
+\addlinespace
+AgU002472 & ANKR1\_HUMAN & (TAAA)5 & 539 & 558 & TGAATACCAGTGGCATCGAAG & CCAGCTCCTATCCACCTGTT & Monomorph\\
+AgU003302 & TNF13\_HUMAN & (GT)5 & 114 & 123 & CCCTTCCAGCTCTTCAGTGA & GCAAGCGGAAAGAGAAGTCA & Monomorph\\
+AgU005573 & TNR1A\_HUMAN & (CCG)5 & 193 & 207 & GATCTTCACCCCGGTCTCC & ACCAGTGCCGTAACCCTTAA & Failed\\
+AgU006059 & PSA1\_HUMAN & (CAT)5 & 397 & 411 & TGTGCCTTTCTCTGTGGTCT & TTAAACATGGTCTGCGTGCC & Monomorph\\
+AgU006358 & PTMS\_HUMAN & (GA)5 & 215 & 224 & GCCTTCTCCTCCACCTTCTC & TCTTCCAGAGACCCAGCTTG & Failed\\
+\addlinespace
+AgU008174 & CD2B2\_MOUSE & (CCT)5 & 147 & 161 & CCCAGAGAGCCGATCCAAG & GGGTGAAGATTAGGGAGCGA & Monomorph\\
+AgU009504 & EP300\_HUMAN & (TGC)5 & 440 & 454 & GGAACTGGTTATGGTTGGCC & TGCCGAACATGAACCCCA & Monomorph\\
+AgU013753 & MYH10\_MOUSE & (TTC)5 & 484 & 498 & TCCAAGTCCTGAATATGCGC & CGAGCTGGAAGAGATGGAGA & Failed\\
+AgU000001 & VWF\_CANLF & (CA)5 & 1586 & 1595 & GGGATTGGTCAGGGTCATCT & GGGCGGAAGGTCAATTGTAC & Monomorph\\
+AgU002562 & AP1AR\_HUMAN & (AT)5 & 939 & 948 & AGTGGCTGCATGTAAAAGGA & GCACAATTGAGTAGATGACCCT & Monomorph\\
+\addlinespace
+AgU000123 & NCKP1\_HUMAN & (CT)5 & 511 & 520 & GCTTCATTTTGTGCCATGGG & GTGACACAGCTGCCTCTTTG & Monomorph\\
+AgU000356 & IL3RB\_HUMAN & (GA)5 & 1841 & 1850 & AATGTGCGTGTGTCTGTGTC & ACATGAGTGGGAGGAGGTCT & Monomorph\\
+AgU000367 & PSA\_HUMAN & (AC)5 & 2501 & 2510 & AAAGGCAGGGTTTTAGCAGC & TCGGAAACCATACCCTGATGA & Failed\\
+AgU000376 & EGR1\_HUMAN & (CCT)5 & 805 & 819 & TTTCTGCTCGTAGTCCTGCA & AGCTCTGCATGGGGAATCAT & Failed\\
+AgU000416 & RAB5B\_PONAB & (AC)5 & 2494 & 2503 & GACTCTGAAGGACCCAGCTT & TGGGGAAAGATGCACAGAGA & Monomorph\\
+\addlinespace
+AgU000542 & ERBB3\_HUMAN & (AG)5 & 662 & 671 & ACTAGCCAACGAGTTCACCA & CATCCTCCTCTGCCTCCAAG & Monomorph\\
+AgU001054 & SDF1\_HUMAN & (TC)5 & 964 & 973 & CCCCTCATCCTCAGCTCTTC & CGCAGGATTGGACAACAGAC & Monomorph\\
+AgU001116 & MYLK\_SHEEP & (GT)5 & 1753 & 1762 & ATGTGCATCAGTCAGGCCTT & CCTGCACTTTACAAACAGTGGA & Monomorph\\
+AgU001679 & TOPRS\_HUMAN & (GA)5 & 1766 & 1775 & ACGAGATCTTGATCTGCTGGT & CAGATTCCCGTTCCCAGAGT & Monomorph\\
+AgU001893 & PDPK1\_HUMAN & (AG)5 & 504 & 513 & TCAAAGAGAACAAGGTCCCGT & ACTCCAGAGCTGACACCATC & Failed\\
+\addlinespace
+AgU002020 & TF65\_MOUSE & (TC)5 & 1366 & 1375 & CTTTGGGTAATGTCTTCTGGGG & GAAGCTGGAGGGTAGGGATG & Polymorph\\
+AgU002404 & NFKB2\_HUMAN & (GC)5 & 1363 & 1372 & GCAGGTGATTGGTGAGGTTG & GTACAATGCGCGCCTGTT & Failed\\
+AgU002579 & AP2A1\_HUMAN & (TG)5 & 1135 & 1144 & CCATCCAGGGGCTGTGTATT & CTGCTACCTGGTGTCCGG & Monomorph\\
+AgU002813 & RIPK1\_HUMAN & (TC)5 & 1011 & 1020 & TGAATGTCATTGCGGAAGGT & CTGATACACGTTCTCTGTCTGC & Monomorph\\
+AgU002947 & NCK1\_HUMAN & (CT)5 & 1509 & 1518 & TGTCCATTGTAGCTACCCCG & AGTGTGCCAGATTCTGCATC & Failed\\
+AgU003069 & NR4A1\_BOVIN & (CT)5 & 688 & 697 & TCAAGGTGTGGAGAAGTGGG & TTCTCACCCAGCCAGACGTA & Monomorph\\*
+\end{longtable}
+
+\elandscape
+
+
+\end{document}
