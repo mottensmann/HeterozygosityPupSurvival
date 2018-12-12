@@ -214,8 +214,10 @@ confidence_interval <- function(vector) {
   vec_sd <- sd(vector)        # standard deviation of sample
   n <- length(vector)         # sample size
   vec_mean <- mean(vector)    # mean of sample
-  error <- qt((.95 + 1)/2, df = n - 1) * vec_sd / sqrt(n)               # error according to t distribution
-  result <- c("lower" = vec_mean - error, "upper" = vec_mean + error)   # confidence interval as a vector
+  # error according to t distribution
+  error <- qt((.95 + 1)/2, df = n - 1) * vec_sd / sqrt(n)   
+  # confidence interval as a vector
+  result <- c("lower" = vec_mean - error, "upper" = vec_mean + error)  
   return(result)
 }
 ```
