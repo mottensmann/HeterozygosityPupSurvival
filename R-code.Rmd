@@ -233,16 +233,13 @@ het_per_locus <- apply(seals_geno, 2, sMLH)
 ## add factors 
 df <-  cbind(sealdf_year, seals_geno) 
 ## add marker type as names to the data.frame
-names(df)[6:66] <- c(paste0("Immune", 1:13), paste0("Neutral", 1:48))
+names(df)[8:68] <- c(paste0("Immune", 1:13), paste0("Neutral", 1:48))
 
 lm_by_loc <- lapply(1:61, function(x) {
   ## extract data of given marker x
   value <- df[,x + 7]           
-  ## do regression
-  ## res <- summary(lme4::lmer(as.numeric(df$health) ~ value + (1|df$year)))  
-  ## conf <- confint(lme4::lmer(as.numeric(df$health) ~ value + (1|df$year)))
-  ## do regression
-  res <- summary(lm(as.numeric(df$health) ~ value))  
+  ## run linear models
+  res <- summary(lm(as.numeric(df$health) ~ value))
   conf <- confint(lm(as.numeric(df$health) ~ value))
   f <- res$fstatistic
   pf(f[1], f[2], f[3], lower=FALSE)
@@ -503,8 +500,8 @@ g2_all_graphs <- grid.arrange(all_graphs_g2_all_bs_histogram,
 
 Here, we repeat the estimation of g2 for each marker type and for the entire dataset
 
-```{r supplementary b, message=FALSE, results='hide', eval=FALSE}
-g2_neutral_resampled <- pbapply::pblapply(seq(4, 48, 4), function(x) { -->
+```{r supplementary b, message=FALSE, results='hide'}
+g2_neutral_resampled <- pbapply::pblapply(seq(4, 48, 4), function(x) { 
   subs <- lapply(1:100, function(y) {
     rand <- sample(1:48, x, replace = FALSE)
     loci <- neutral_markers[, rand]
@@ -553,7 +550,7 @@ g2_neutral_resampled_plot
 
 Next, we test for patterns in allelic richness among markers (i.e. immune vs neutral), developmental source (i.e. designed for Antarctic fur seals, phocids or otariids). Secondly, we evaluate the cross-amplification success of loci in two other species of pinnipeds, namely the Grey seal and Nothern Elephant seal. 
 
-```{r}
+```{r, message=FALSE, results='hide'}
 ## read and format genotypes
 heatmap_df <- readxl::read_xlsx("data/genotypes_raw.xlsx", skip = 1)[, c(3, 8:ncol(seals))]
 
@@ -595,7 +592,9 @@ genind <- adegenet::df2genind(marker_geno, ploidy = 2, sep = "/",
 
 ## convert to GENPOP
 genpop <- adegenet::genind2genpop(genind)
+```
 
+```{r}
 heatmap_df <- lapply(levels(genpop@loc.fac), function(i) {
   df.temp <- genpop@tab[,which(genpop@loc.fac == i)]   ## fetch data 
   if (is.null(dim(df.temp))) {
@@ -603,8 +602,8 @@ heatmap_df <- lapply(levels(genpop@loc.fac), function(i) {
     df.temp[df.temp == 0] <- 0
     
   } else {
-    df.temp <-   apply(df.temp, 2, function(x) ifelse(x > 0, 1, 0)) 
-    %>% ## presence/absence of allele
+    df.temp <-   apply(df.temp, 2, function(x) ifelse(x > 0, 1, 0)) %>%
+      ## presence/absence of allele
     rowSums(na.rm = T) ## count alleles
   }
   # return results
@@ -658,7 +657,7 @@ ggsave(plot,
        units = "in",
        dpi = 300)
 ```
-```{r, message=FALSE, echo=FALSE, eval=FALSE}
+```{r}
 plot
 ```
 
@@ -666,7 +665,7 @@ plot
 
 The heatmap above shows several patterns which are tested statistically next.
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 ## get raw data again
 genotypes_raw <- readxl::read_xlsx("data/genotypes_raw.xlsx", skip = 1)[, c(3, 8:ncol(seals))]
 
@@ -688,7 +687,8 @@ marker_geno[which(marker_geno == "NA/NA")] <- NA
 ## create GENIND for Antarctic fur seal alone
 genind_afs <- adegenet::df2genind(marker_geno[1:78,], ploidy = 2, sep = "/")
 ```
-```{r, warning=FALSE, results='hide'}
+
+```{r, warning=FALSE, results='hide', message=FALSE}
 ## extract allele numbers for both marker types
 immune_afs <- genind@loc.n.all[1:13]
 mean(immune_afs)
@@ -697,12 +697,12 @@ sd(immune_afs)
 neutral_afs <- genind@loc.n.all[14:61]
 mean(neutral_afs)
 sd(neutral_afs)
-```
-```{r}
+
 ## compare marker types
 wilcox.test(immune_afs, neutral_afs, paired = F)
 ```
-```{r, results='hide'}
+
+```{r, warning=FALSE, results='hide', message=FALSE}
 ## compare neutral markers by origin
 neutral_afs <- genind@loc.n.all[14:22]
 mean(neutral_afs)
@@ -711,11 +711,12 @@ sd(neutral_afs)
 neutral_others <- genind@loc.n.all[23:61]
 mean(neutral_others)
 sd(neutral_others)
-```
-```{r}
+
 ## compare by marker
 wilcox.test(neutral_afs, neutral_others, paired = F)
+```
 
+```{r, warning=FALSE, results='hide', message=FALSE}
 ## cross-amplification
 immune <- dplyr::filter(heatmap_df, Species != "Antarctic fur seal", 
                         Type == "Immune")[["Alleles"]]
