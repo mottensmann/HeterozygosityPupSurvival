@@ -1,37 +1,49 @@
 ---
 title: "R-code for 'Heterozygosity at neutral and immune loci does not influence neonatal mortality due to microbial infection in Antarctic fur seals'"
 author: "Vivienne Litzke, Meinolf Ottensmann, Jaume Forcada & Joseph I. Hoffman"
-output: html_document
+output: pdf_document
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Preface
+#### Preface
 
 This document provides all the `R code` used in our paper. Both the Rmarkdown file and the data can be downloaded from the accompanying GitHub repository on (https://github.com/vlitzke/HeterozygosityPupSurvival) as a zip archive containing all the files. 
-Our data originates from samples collected from a colony of Antarctic fur seals (*Arctocephalus gazella*) at Bird Island, South Georgia between the years of 2000 and 2014. We investigated the effects of neutral and immune gene heterozygosity on early mortality due to bacterial infection using the `inbreedR` package.[^1]
+We recommend to download or clone this [GitHub repository](https://github.com/vlitzke/HeterozygosityPupSurvival) in order to access the documentation together with all the files that are needed to repeat analyses shown in this document. Just click on the link above and then on the green box `Clone or download`. In order to function properly, the same structure of folders must be kept. If you have any questions, don't hesitate to contact meinolf.ottensmann[at]web.de or vivienne.litzke[at]gmail.com
+
+The data originates from samples collected from a colony of Antarctic fur seals (*Arctocephalus gazella*) at Bird Island, South Georgia between the years of 2000 and 2014. We investigated the effects of neutral and immune gene heterozygosity on early mortality due to bacterial infection using the `inbreedR` package.[^1]
 
 [^1]: Stoffel, M. A., Esser, M., Kardos, M., Humble, E., Nichols, H., David, P., & Hoffman, J. I. (2016). inbreedR: an R package for the analysis of inbreeding based on genetic markers. Methods in Ecology and Evolution, 7(11), 1331-1339.
 
-***
+- If you have downloaded the project from github then you will see that:
+- The raw data required are located in the folder `data/`
+- The *Arctocephalus gazella* transcriptome[^8] may be downloaded [here](http://ramadda.nerc-bas.ac.uk/repository/entry/show/Polar+Data+Centre/NERC-BAS+Datasets/Genomics/Transcriptomes/Arctocephalus_gazella/Arctocephalus_gazella_transcripts.fasta?entryid=synth%3A2d2268fe-907c-45b0-a493-0a6cab8642e6%3AL1RyYW5zY3JpcHRvbWVzL0FyY3RvY2VwaGFsdXNfZ2F6ZWxsYS9BcmN0b2NlcGhhbHVzX2dhemVsbGFfdHJhbnNjcmlwdHMuZmFzdGE%3D) and saved as `arc_gaz_transcriptome.fasta` in `data`.
+- This pipeline invokes the `MIcroSAtellite identification tool` for primer identification. Click on the following link for details and how to install it: [MISA](http://pgrc.ipk-gatersleben.de/misa/misa.html)[^9]. 
+- Primer development was conducted using [primer3](http://primer3.sourceforge.net/releases.php)[^10].
+- Additionally, the `R packages` listed below are required and may be installed on your system.
 
-### Download packages and libraries
+[^1]: Humble, E., Thorne, M.A., Forcada, J. & Hoffman, J.I., (2016). Transcriptomic SNP discovery for custom genotyping arrays: impacts of sequence data, SNP calling method and genotyping technology on the probability of validation success. BMC research notes, 9(1), p.418.
+[^2]: Thiel, T., (2003). MISA—Microsatellite identification tool. Website http://pgrc. ipk-gatersleben.
+[^3]: Untergasser, A., Nijveen, H., Rao, X., Bisseling, T., Geurts, R. & Leunissen, J.A., (2007). Primer3Plus, an enhanced web interface to Primer3. Nucleic acids research, 35(suppl_2), pp.W71-W74.
+
+#### Download packages and libraries
 
 In order to repeat analyses presented in this manuscript a number of packages that extend the functionalities of base `R` are required. These can be installed using the code shown below. 
 
 ```{r, comment="install packages", eval=FALSE}
 install.packages('inbreedR')
-install.packages("Rcpp")
 install.packages("readxl")
 install.packages("ggplot2")
 install.packages("gridExtra")
-install.packages("stringi", repos="http://cran.rstudio.com/", dependencies=TRUE)
-install.packages("fansi")
+install.packages("stringi")
 install.packages("adegenet")
 install.packages("AICcmodavg")
-install.packages("raster")
 install.packages("reshape2")
 install.packages("kableExtra")
 source("https://bioconductor.org/biocLite.R")
@@ -78,28 +90,29 @@ seals_geno <- convert_raw(seals[8:ncol(seals)])
 check_data(seals_geno, num_ind = 78, num_loci = 61)
 ```
 
-***
+## Analysis
 
-### Separate loci by marker type
+### Estimating standard multilocus heterozygosity (sMLH)
 
 Divide the neutral and immune markers from their respective columns in the adjusted inbreedR format, and compute standard multilocus heterozygosity (sMLH).[^2] 
 
 [^2]: Coltman, D. W. and J. Slate. 2003. Microsatellite measures of inbreeding: a meta-analysis. Evolution 57:971–983.
 
 ```{r}
+## subset markers based on type
 immune_markers <- seals_geno[, 1:13]
 neutral_markers <- seals_geno[, 14:61]
 
+## estimate sMLH
 all_het <- sMLH(seals_geno)
 neutral_het <- sMLH(neutral_markers)
 immune_het <- sMLH(immune_markers)
 ```
 
-### Create and reshape dataframe
-
 Take out id, health, marker types, and birth weight as variables.
 
 ```{r message=FALSE}
+## format data frames
 birthweight <- as.numeric(as.character(seals[["Birthweight"]]))
 
 sealdata <- data.frame(id = seals[[4]],  health = factor(seals[[6]]), 
@@ -112,16 +125,17 @@ sealdata_reshaped <- reshape2::melt(sealdata)
 sealdf_year <- cbind(sealdataweight, year = as.numeric(seals[[5]])) 
 ```
 
-***
 
-### Calculate *g*~2~
+### Estimating inbreeding (*g*~2~)
 
 *g*~2~ is a proxy for identity disequilibrium. It is a measure of two-locus disequilibrium, which quantifies the extent to which heterozygosities are correlated across pairs of loci.[^3] This allows us to take a look at our neutral marker heterozygosity to determine if there is variation in inbreeding in the population. 
 
 [^3]:David, P., Pujol, B., Viard, F., Castella, V., & Goudet, J. (2007). Reliable selfing rate estimates from imperfect population genetic data. Molecular ecology, 16(12), 2474-2487.
 
 ```{r neutral g2, message=FALSE, warning=FALSE, results='hide'}
+## calculate g2
 g2_neutral <- g2_microsats(neutral_markers, nperm = 9999, nboot = 9999) 
+## format output
 g2_neutral_bs <- data.frame(bs = g2_neutral$g2_boot,
                             lcl = g2_neutral$CI_boot[[1]],
                             ucl = g2_neutral$CI_boot[[2]],
@@ -169,10 +183,6 @@ ggsave(g2_neutral_bs_histogram, filename = "g2_neutral_bs_histogram",
      units = "in", dpi = 300, width = 6, height = 6)
 ```
 
-***
-
-### Plot heterozygosity among marker sets
-
 In order to visualize sMLH for all, neutral, and immune markers, create the following box-plot:
 
 ```{r}
@@ -203,9 +213,7 @@ ggsave(het_plot, filename = "het_plot.jpeg",
      units = "in", dpi = 300, width = 6, height = 6)
 ```
 
-***
-
-### Calculate heterozygosity for each individual locus
+### Estimating heterozygosity for individual loci
 
 As we have previously looked at genome-wide effects, it may be of interest to look for local effects. Therefore, we  examined the heterozygosity for each locus. First, define the function confidence interval:
 
@@ -310,19 +318,20 @@ To look for local effects between effect sizes of the neutral and immune loci, u
 wilcox.test(lm_by_loc$beta[1:13],lm_by_loc$beta[14:61])
 ```
 
-***
-
-### Create the final combined figure
-
 To create a combination plot of all figures (as in the manuscript):
 
 ```{r create combo_plot, message=FALSE, results='hide', warning=FALSE}
+## define layout of the plot
 lay <- rbind(c(1,3),
              c(2,3))
 
+## combine figures
 combo_plot <- grid.arrange(g2_neutral_bs_histogram, 
                            het_plot, 
                            het_by_loci_plot, ncol = 3, layout_matrix = lay)
+```
+
+```{r, echo=FALSE}
 combo_plot
 ```
 
@@ -331,13 +340,12 @@ ggsave(combo_plot, filename = "combo_plot.jpeg",
      units = "in", dpi = 300, width = 6, height = 6)
 ```
 
-***
-
-### Modeling
+### Modeling effects of sMLH on bacterial infection status
 
 To test for associations between microsatellite heterozygosity and death from bacterial infection, we constructed several alternative generalized linear mixed-models (GLMMs) incorporating relevant predictor variables and quantified their relative support using AICc weights within a multi-model inference framework. All of the models had pup survival as a binary response variable (coded as 0 = alive and 1 = dead) and included year as a random effect to statistically control for any variation in survivorship attributable to inter-annual variation. The following GLMMs were considered:
 
 ```{r AIC models}
+## define models
 models <- list(
   glmer(health ~  1 + (1|year), data = sealdf_year, family = 'binomial'),
   glmer(health ~  All + (1|year), data = sealdf_year, family = 'binomial'),
@@ -349,7 +357,7 @@ models <- list(
   glmer(health ~  Neutral + birthweight + (1|year), data = sealdf_year, family = 'binomial')) 
 names(models) <- paste0("m", 1:length(models))
 
-## model selection
+## model selection using delta AICc
 kableExtra::kable(AICcmodavg::aictab(models, second.ord = T), booktabs = TRUE,
                   longtable = FALSE, caption = "Model selection")
 
@@ -366,7 +374,7 @@ These included 'null models' without any genetic effects (models i and v) as wel
 Apply a false discovery rate correction for a table of p-values.
 
 ```{r FDR, message=FALSE, warning=FALSE, results='hide'}
-
+## read p-values corrected for false discovery rate 
 pval <- read.table("data/pvalues.txt",header = F, sep = ",") %>% as.vector() %>% .[[1]]
 qobj <- qvalue(pval)
 
@@ -380,11 +388,9 @@ df <- data.frame(p = qobj$pvalues,
 #view(df)
 ```
 
-***
+### Supplementary
 
-# Supplementary Data
-
-#### (A) *g*~2~ for all marker sets.
+##### (A) Estimating inbreeding (*g*~2~) for all marker sets.
 
 To explore the idea that variation in inbreeding can be captured among different marker sets, calculate *g*~2~ for all and immune microsats and create histograms:
 
@@ -496,11 +502,11 @@ g2_all_graphs <- grid.arrange(all_graphs_g2_all_bs_histogram,
                               all_graphs_g2_immune_bs_histogram, ncol = 3)
 ```
 
-#### (B) Calculate g2 for subsets of the data 
+##### (B) Sensitivity of loci number on estimates of *g*~2~
 
-Here, we repeat the estimation of g2 for each marker type and for the entire dataset
+Here, we repeat the estimation of *g*~2~ for each marker type and for the entire dataset
 
-```{r supplementary b, message=FALSE, results='hide'}
+```{r supplementary b, message=FALSE, results='hide', eval=FALSE}
 g2_neutral_resampled <- pbapply::pblapply(seq(4, 48, 4), function(x) { 
   subs <- lapply(1:100, function(y) {
     rand <- sample(1:48, x, replace = FALSE)
@@ -518,8 +524,11 @@ g2_neutral_resampled <- pbapply::pblapply(seq(4, 48, 4), function(x) {
                     ucl = confidence_interval(subs$g2)[2]))
 }) %>%  do.call("rbind", .)
 g2_neutral_resampled$loci <- seq(4, 48, 4)
-## save data
-save(g2_neutral_resampled, file = "data/g2_neutral_resampled.RData")    
+```
+
+```{r}
+## load saved dataset
+load("data/g2_neutral_resampled.RData")
 
 g2_neutral_resampled_plot <-
   ggplot(data = g2_neutral_resampled, aes(x = loci, y = g2)) +
@@ -546,7 +555,7 @@ g2_neutral_resampled_plot <-
 g2_neutral_resampled_plot
 ```
 
-#### (C) Heat map
+##### (C) Patterns of allelic richness and cross-amplification
 
 Next, we test for patterns in allelic richness among markers (i.e. immune vs neutral), developmental source (i.e. designed for Antarctic fur seals, phocids or otariids). Secondly, we evaluate the cross-amplification success of loci in two other species of pinnipeds, namely the Grey seal and Nothern Elephant seal. 
 
@@ -644,7 +653,7 @@ plot <- ggplot(data = heatmap_df, aes(x = Species, y = Locus, fill = Alleles)) +
     legend.justification = c(0, 1),
     legend.direction = "vertical",
     legend.margin = margin(0,0,0,5, "mm"),
-    axis.text.y = element_text(hjust = 0, colour = col_key, size = 10),
+    axis.text.y = element_text(hjust = 0, colour = col_key, size = 8),
     axis.line.x = element_blank(),
     axis.text.x = element_text(size = 10)) + 
   xlab("Species") +
@@ -657,11 +666,10 @@ ggsave(plot,
        units = "in",
        dpi = 300)
 ```
-```{r}
+
+```{r, echo=FALSE}
 plot
 ```
-
-### Compare allelic richness
 
 The heatmap above shows several patterns which are tested statistically next.
 
@@ -730,3 +738,267 @@ mean(neutral) ## cross-amplification rate
 
 wilcox.test(neutral, immune, paired = F)
 ```
+
+## Microsatellite development
+
+### Identifying microsatellites within the transcriptome
+
+Short tandem repeats were identified within the Antarctic fur seal transcriptome assembly using the script `misa.pl`. The required initiation file called `misa.ini` is available in the folder `data` and defines the minimum number of five repeats for di-, tri- and tetranucleotide motifs. *As already mentioned before, [MISA](http://pgrc.ipk-gatersleben.de/misa/misa.html) needs to be downloaded by the user*
+
+```bash
+# identify microsats
+perl misa.pl arc_gaz_transcriptome.fasta
+```
+
+The code above generates one ouput file `arc_gaz_transcriptome.fasta.misa` containing a total of `r length( readLines("data/arc_gaz_transcriptome.fasta.misa")) - 1` microsatellites found within the transcriptome. The resulting data table was subsequently reformatted for further filtering steps. 
+
+```{r, eval=T}
+## read the data
+data <- readLines("data/arc_gaz_transcriptome.fasta.misa")
+
+## create a matrix
+microsats_table <- matrix(ncol = length(strsplit(data[1], split = "\t")[[1]]),
+                          nrow = length(data))
+for (i in 1:length(data)) {
+microsats_table[i,1:length(strsplit(data[i], split = "\t")[[1]])] <- 
+  strsplit(data[i], split = "\t")[[1]]
+}
+microsats_table <- as.data.frame(microsats_table[2:nrow(microsats_table),])
+
+## add column names
+names(microsats_table) <-
+  c('contig.name', 'ssr.no','ssr.type','ssr.seq','ssr.size','ssr.start','ssr.end') 
+
+## read contig length information
+contig_length <- read.table("data/transcriptlength.txt", header = T)
+names(contig_length) <- c('MatchID', 'contig.length')
+
+## set to character
+microsats_table[["contig.name"]] <-
+  as.character(microsats_table[["contig.name"]])
+contig_length[["MatchID"]] <-
+  as.character(contig_length[["MatchID"]])
+
+## correct 'MatchID' for cross-referencing
+microsats_table[["MatchID"]] <- NA
+for (i in 1:nrow(microsats_table)) {
+  # discard chunk following the underscore (e.g. 4708387_length... becomes 4708387)
+  microsats_table$MatchID[i] <-
+   strsplit(microsats_table$contig.name[i],split = "_")[[1]][1]
+  microsats_table$MatchID[i] <-
+    strsplit(microsats_table$MatchID[i],split = " ")[[1]][1]
+} 
+
+## correct contig_length
+for (i in 1:nrow(contig_length)) {
+  # remove everything after the underscore, see above
+  contig_length$MatchID[i] <-
+    strsplit(contig_length$MatchID[i],split = "_")[[1]][1]
+}
+
+## merge data frames
+microsats_table <-
+dplyr::left_join(microsats_table,contig_length, by = "MatchID")
+
+## some data class conversions
+microsats_table[["ssr.start"]] <-
+  as.numeric(as.character(microsats_table[["ssr.start"]])) 
+microsats_table[["ssr.end"]] <-
+  as.numeric(as.character(microsats_table[["ssr.end"]]))
+microsats_table[["contig.length"]] <-
+  as.numeric(as.character(microsats_table[["contig.length"]]))
+
+## export Supplementary Table S1
+write.csv(microsats_table, file = "data/Supplementary Table S1.csv", row.names = F)
+
+## summary of microsatellite types
+summary(microsats_table$ssr.type)
+```
+
+### Filtering Microsatellites
+
+Among the `r nrow(microsats_table)` identified microsatellites, there are some compound microsatellites as well as repeats that do not offer adequate flanking sites for primer design. These were discarded next.
+
+```{r}
+## remove compound microsats
+microsats_table <- 
+  subset(microsats_table, microsats_table[["ssr.type"]] != 'c') 
+microsats_table <- 
+  subset(microsats_table, microsats_table[["ssr.type"]] != 'c*')
+
+## selection based on flanking sites
+microsats_table[["temp"]] <-
+  rep(1,nrow(microsats_table)) # flag for removal
+for (i in 1:nrow(microsats_table)) {
+  # inspect flanking site upstream
+if (microsats_table[["ssr.start"]][i] <= 100) {
+      microsats_table[["temp"]][i] <- 0
+      # inspect flanking site downstream
+} else if ((microsats_table[["contig.length"]][i] -
+            microsats_table[["ssr.end"]][i]) <= 100) {
+    microsats_table[["temp"]][i] <- 0
+  }
+}  
+
+## Remove flagged microsats
+microsats_table <- subset(microsats_table, microsats_table[["temp"]] != 0) 
+microsats_table <- microsats_table[,1:9]
+```
+
+After the above filtering `r nrow(microsats_table)` microsatellites were retained. Now, we selected microsatellites that are associated to immunity based on [Gene Ontology](http://www.geneontology.org/) Gene annotations.
+
+```{r}
+## Keywords including 'immune*'
+annotation <- readLines("data/arc_gaz_transcriptome_annotations.txt")
+annotations <- matrix(ncol = 18, nrow = length(annotation))
+
+## fill table
+for (i in 1:nrow(annotations)) {
+annotations[i, 1:length(strsplit(annotation[i], split = "\t")[[1]])] <-
+  strsplit(annotation[i], split = "\t")[[1]]
+}
+annotations <- data.frame(annotations)[-1,]
+annotations <- annotations[, c(1,14:18)]
+names(annotations) <- c('MatchID','goTerm','cellular.components','biological.processes',
+                        'molecular.functions','keywords')
+
+annotations[["MatchID"]] <- as.character(annotations[["MatchID"]])
+for (i in 1:nrow(annotations)) {
+  annotations[["MatchID"]][i] <-
+    strsplit(annotations[["MatchID"]][i],split = "_")[[1]][1]
+} 
+
+annotations.extd <- dplyr::left_join(microsats_table, annotations,by = 'MatchID')
+
+immuneTable2 <- data.frame(annotations.extd) %>% # Check for matches with keywords
+  dplyr::filter(grepl('immun*', keywords)) 
+
+ImmuneMarker_Keywords <- immuneTable2 # 13 within just keywords
+```
+
+
+```{r, echo=FALSE, eval=FALSE}
+## overview
+ImmuneMarker_whole_file$keywords
+kableExtra::kable(ImmuneMarker_Keywords[,c(1, 14)] , 
+                  booktabs = TRUE, longtable = TRUE,
+                  caption = "Keywords 'Immune'") %>%
+kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header"))
+```
+
+For 13 microsatellites, we found a match to the term 'immun*' under the keywords of the GO annotations. To increase the number of suitable microsatellites, we repeated the initial search to all categories of the GO annotations with an extended list of search terms shown below.
+
+```{r}
+## define list of keywords
+immune <- c('immun*', 'antigen', 'chemokine', 'T cell',
+            'MHC', 'Antibody', 'histocompatibility',
+            'Interleukin', 'Leucocyte', 'Lymphocyte')
+
+immuneLines <- NULL
+for (i in immune) { 
+  immuneLines <- c(immuneLines, annotation[grep(i, annotation, ignore.case = T)])
+}
+
+immuneTable <- matrix(ncol = 18, nrow = length(immuneLines))
+
+for (i in 1:length(immuneLines)) {
+immuneTable[i,1:length(strsplit(immuneLines[i], split = "\t")[[1]])] <-
+  strsplit(immuneLines[i], split = "\t")[[1]]
+}
+immuneTable <- data.frame(immuneTable)[,c(1,10,14:18)] 
+names(immuneTable) <-
+  c('MatchID','geneID','goTerm','cellular.components','biological.processes',
+                        'molecular.functions','keywords') 
+
+immuneTable[["MatchID"]] <-
+  as.character(immuneTable[["MatchID"]])
+for (i in 1:nrow(immuneTable)) {
+  immuneTable[["MatchID"]][i] <-
+    strsplit(immuneTable[["MatchID"]][i],split = "_")[[1]][1]
+} 
+
+ImmuneMarker_whole_file <-
+  unique(dplyr::inner_join(microsats_table, immuneTable, by = "MatchID")) 
+
+## write to file
+write.csv2(ImmuneMarker_whole_file, file = "data/immune_microsats_raw.csv", row.names = F)
+```
+
+The extended search yielded a total of `r nrow(ImmuneMarker_whole_file)` microsatellites. The entire list is shown below.   
+
+```{r, echo=FALSE}
+kableExtra::kable(ImmuneMarker_whole_file[, c(1, 4, 6:7, 10)],
+                  booktabs = TRUE, longtable = TRUE,
+                  col.names = c('Contig', 'Motif', 'Start', 'End', 'Gene ID'),
+                  caption = "Annotated microsatellites") %>%
+kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header"))
+```
+
+\newpage
+
+### Designing primers
+
+For all of the `r nrow(ImmuneMarker_whole_file)` we developed oligonucleotide primers using the primer design tool [primer3](http://primer3.sourceforge.net/releases.php). In order to use the command line interface, the list of microsatellites should be re-formatted accordingly. 
+
+```{r, eval=T}
+## list of microsatellites 
+data <- read.csv(file = "data/immune_microsats_raw.csv", sep = ';')[,1:7] 
+names(data) <- c('ID','SSR nr.','SSR type','SSR','size','start','end')
+data[["ID"]] <- as.character(data[["ID"]])
+
+for (i in 1:nrow(data)) {
+  if ((nchar(data[["ID"]][i]) > 20)) {
+    data[["ID"]][i] <- 
+      paste0(strsplit(data[["ID"]][[i]],split = "_")[[1]][1]," ", 
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][2]," ",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][3]," ",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][4],"_",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][5],"_",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][6],"_",
+             strsplit(data[["ID"]][[i]],split = "_")[[1]][7])
+  }
+}
+write.table(row.names = FALSE, quote = FALSE,x = data,
+            sep = "\t",file = 'data/arc_gaz_transcriptome.fasta.misa2')
+```
+
+### Invoke primer3 for primer design
+
+```bash
+perl p3_in_fur_seal.pl arc_gaz_transcriptome.fasta.misa2
+primer3_core <arc_gaz_transcriptome.fasta.p3in> arc_gaz_transcriptome.fasta.p3out
+``` 
+
+### Overview of initially tested microsatellites
+
+The table below summarises the results of testing 96 primers on 12 Antarctic fur seal indiviudals. See the manuscript for further details. 
+
+\newpage
+\blandscape
+
+```{r, echo=FALSE}
+## overview
+results <- read.csv("data/Supplementary Table S2.csv")[,-c(2, 5:7)]
+results$Forward.primer_.5..3._._M13..21..tail <- stringr::str_remove(
+  string = results$Forward.primer_.5..3._._M13..21..tail,
+  pattern = "TGTAAAACGACGGCCAGT")
+kableExtra::kable(results, booktabs = TRUE, 
+                  longtable = TRUE, caption = "Overview microsatellite testing. Primers used in the present study are named Agi01-Agi11", 
+                  col.names = c("Contig", "Gene ID", "Motif", 
+                                'Marker ID', 
+                                "Forward primer 5'-3'",
+                                "Reverse primer 5'-3'",
+                                "PCR result")) %>%
+kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header"))
+```
+
+\elandscape
+
+***
+
+```{r, echo = FALSE}
+sessioninfo::session_info()
+```
+
+
+***
